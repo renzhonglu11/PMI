@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+
+
 /**
  * @brief Initialises GPIOs for nucleo's serial-usb bridge. Pins are PA2
  * and PA3.
@@ -106,6 +108,7 @@ int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len)
 {
 
     int i=0;
+ 
 
     while(i<size-2 )
     {
@@ -124,7 +127,8 @@ int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len)
     }
     
     buf[i] = '\0';
-    
+  
+
     return *len;
 }
 
@@ -132,13 +136,49 @@ int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len)
 int32_t uart_rx_uint(uint16_t *val)
 {   
 
-    char input_int;
+    char input_txt;
+    uint8_t i = 0;
+    *val = 0;
 
-    {
-        input_int = uart_rx_char();
+    while(1){
+      if(input_txt == '\n'){
+        break;
+      }
 
-        uint16_t result = (uint16_t)input_int;
-    }while(input_int != '\n');
+      input_txt = uart_rx_char();
+        
+      uint16_t input_int = atoi(&input_txt);
+      for(int j = 0;j<i;j++)
+      {
+          input_int = input_int * 10;
+      }
 
+      *val = input_int + *val;
+      i++;
+    }
+
+
+    return *val;
     
+}
+
+void toggle_led_with_input()
+{
+  char input_txt = uart_rx_char();
+
+
+  if(input_txt == '1')
+  {
+    GPIOA->BSRR = GPIO_BSRR_BS_5;
+  }
+  else if(input_txt == '0')
+  {
+    GPIOA->BRR = GPIO_BSRR_BS_5;
+  }
+  else
+  {
+    uart_tx_str("Wrong input\n");
+  }
+  
+  return;
 }

@@ -32,17 +32,23 @@ int main(void)
 
 
         // uart_tx_str(text);
-        char buf [10];
-        uint16_t  len = 0;
+        char buf[10];
+        char *char_ptr = buf;
+        uint16_t a= 0;
+        uint16_t  *len_ptr = &a;
 
-        uart_rx_str(&buf, 10, &len);
+        // uart_rx_str(char_ptr, 10, len_ptr);
       
-        uint16_t int_arr[len];
+        
         // uart_tx_str(buf);
 
-        uint16_t a = 10;
+        // uint16_t my_int = 0;
+        
+        // uart_rx_uint(&my_int); // Die Reihenfolge ist umgekehrt.
 
-        uart_rx_uint(&int_arr);
+        // uint16_t b = 10;
+
+        toggle_led_with_input();
 
         systick_delay_ms(1000);
     }
