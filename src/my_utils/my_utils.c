@@ -22,21 +22,22 @@ void initial_interrupt()
 
 void TIM2_Int_Init()
 {
+    
     // RCC->APB1RSTR |= RCC_APB1RSTR_TIM2RST;
     RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM2RST;
 
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN; // enable timer2
     
-    TIM2->PSC  = 16000-1;
+    TIM2->PSC  = 160000-1; // not sure how to calculate this exactly
     TIM2->ARR = 500-1; // auto reload register
 
-    TIM2->DIER |= TIM_DIER_UIE; // DMA
+    TIM2->DIER |= TIM_DIER_UIE; // DMAdier
 
     NVIC_ClearPendingIRQ(TIM2_IRQn);
     NVIC_SetPriority(TIM2_IRQn,1);
     NVIC_EnableIRQ(TIM2_IRQn); // enable NVIC interrupt for timer 2
 
-    TIM2->CR1 |= TIM_CR1_CEN;
+    TIM2->CR1 |= TIM_CR1_CEN; // enable timer2
 
 }
 

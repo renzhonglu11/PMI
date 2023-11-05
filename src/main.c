@@ -8,31 +8,53 @@
 
 
 
-void TIM3_PWM_Init()
+void TIM3_PWM_Init(int16_t *arr, int16_t *incr)
 {
+    
+
+    RCC->APB1RSTR |= RCC_APB1RSTR_TIM2RST; 
     RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM2RST;
+    
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN; // enable timer2
+    
+    GPIOA->MODER |= GPIO_MODER_MODE5_1;
+    GPIOA->MODER &= ~(GPIO_MODER_MODE5_0); 
 
+    TIM2->PSC  = 1600-1;
 
-    TIM2->PSC  = 16000-1;
-    TIM2->ARR = 500-1; 
+    char input = uart_rx_char();
+    if(input == '1')
+    {
+      *arr += *incr;
+      TIM2->ARR = *arr - 1;
+    }else if(input == '0')
+    {
+      *arr -= *incr;
+      TIM2->ARR = *arr - 1;
+    }else
+    {
+      TIM2->ARR = *arr - 1;
+    }
+    
+    
+    TIM2->CCR1 = 10; // compare register
+
 
     // set to 111
-    TIM2->CCMR1 |= TIM_CCMR1_OC1M_0;
-    TIM2->CCMR1 |= TIM_CCMR1_OC1M_1;
-    TIM2->CCMR1 |= TIM_CCMR1_OC1M_2; 
+    TIM2->CCMR1 = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1PE;
+  
 
     TIM2->CCER |= TIM_CCER_CC1E; // enable capture
-
+    TIM2->CR1 |= TIM_CR1_CEN; // time2 enable
 
     // set GPIOA to output
-    GPIOA->MODER |= GPIO_MODER_MODE5_0;
-    GPIOA->MODER &= ~(GPIO_MODER_MODE5_1); 
+    // GPIOA->MODER |= GPIO_MODER_MODE5_0;
+    // GPIOA->MODER &= ~(GPIO_MODER_MODE5_1); 
 
-    // TIM2-> |= TIM_CR1_ARPE; // auto reload enable
-    TIM2->CR1 |= TIM_CR1_CEN; // time2 enable
+    GPIOA->AFR[0] = 5 << GPIO_AFRL_AFSEL5_Pos;
     
 }
+
 
 
 void TIM2_IRQHandler( void )
@@ -50,9 +72,8 @@ void EXTI4_15_IRQHandler(void)
 {
     if(EXTI->PR & EXTI_PR_PIF13) // pending bit of EXTI 13
     {
-        GPIOA->ODR ^= GPIO_BSRR_BS_5;
-        
-        EXTI->PR = EXTI_PR_PIF13; // write one to corresponding pending bit to clear it
+        EXTI->PR = EXTI_PR_PIF13; // write one to corresponding pending bit to clear pending bit
+        GPIOA->ODR ^= GPIO_BSRR_BS_5; 
     }
 }
 
@@ -69,7 +90,7 @@ int main(void)
     RCC->IOPENR |= RCC_IOPENR_GPIOCEN;
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN; // enable clock for SYSCFG
    
-    
+
     GPIOA->MODER |= GPIO_MODER_MODE5_0;
     GPIOA->MODER &= ~(GPIO_MODER_MODE5_1); 
 
@@ -79,15 +100,62 @@ int main(void)
 
     // initial_interrupt();
     TIM2_Int_Init();
+    // TIM3_PWM_Init();
+
     
 
     const char text[] = "Hello, World!\n";
     int16_t data[] = {0, 123, 42, -399};
 
+    int16_t arr_incr = 100;
+    int16_t arr = 2;
 
+    
 
     while(1)
-    {
+    {   
+        // TIM3_PWM_Init(&arr, &arr_incr);
+        // toggle_led_with_input();
+        char input = uart_rx_char();
+        uart_tx_char(input);
+        // if(input == '1')
+        // {
+                   
+        //   if(arr + arr_incr>1000)
+        //   {
+        //     continue;
+        //   }
+        //   arr += arr_incr;
+        //   // TIM3_PWM_Init(arr);
+            
+        // }else if(input == '0')
+        // {
+        //   if(arr -arr_incr<0){
+        //     continue;
+        //   }
+        //   arr -= arr_incr;
+        //   // TIM3_PWM_Init(arr);
+        // }
+
+        // if(input == '1')
+        // {
+        //   uart_tx_char(input);
+        //   if(arr + arr_incr>1000)
+        //   {
+        //     continue;
+        //   }
+        //   arr += arr_incr;
+        //   TIM3_PWM_Init(arr);
+            
+        // }else if(input == '0')
+        // {
+        //   uart_tx_char(input);
+        //   if(arr -arr_incr<0){
+        //     continue;
+        //   }
+        //   arr -= arr_incr;
+        //   TIM3_PWM_Init(arr);
+        // }
         /* Call your routines here */
 
         //GPIOA->ODR ^= GPIO_ODR_OD5;
@@ -132,7 +200,7 @@ int main(void)
         // max_ptr = max_value_ptr(data,4);
         
 
-        // *max_ptr = 1337; // change the corresponding value in data array
+        
 
         // uint16_t max_len = 0;
         // char max_buf[20];
