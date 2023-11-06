@@ -40,11 +40,11 @@ void TIM3_PWM_Init(int16_t *arr, int16_t *incr)
     TIM2->CCR1 = 10; // compare register
 
 
-    // set to 111
+    // set to 111, configure filter
     TIM2->CCMR1 = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1PE;
   
 
-    TIM2->CCER |= TIM_CCER_CC1E; // enable capture
+    TIM2->CCER |= TIM_CCER_CC1E; // capture/compare 1 output enable
     TIM2->CR1 |= TIM_CR1_CEN; // time2 enable
 
     // set GPIOA to output
