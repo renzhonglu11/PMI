@@ -8,7 +8,7 @@
 
 
 
-void TIM3_PWM_Init(int16_t *arr, int16_t *incr)
+void TIM3_PWM_Init(int16_t ccr)
 {
     
 
@@ -20,24 +20,9 @@ void TIM3_PWM_Init(int16_t *arr, int16_t *incr)
     GPIOA->MODER |= GPIO_MODER_MODE5_1;
     GPIOA->MODER &= ~(GPIO_MODER_MODE5_0); 
 
-    TIM2->PSC  = 1600-1;
-
-    char input = uart_rx_char();
-    if(input == '1')
-    {
-      *arr += *incr;
-      TIM2->ARR = *arr - 1;
-    }else if(input == '0')
-    {
-      *arr -= *incr;
-      TIM2->ARR = *arr - 1;
-    }else
-    {
-      TIM2->ARR = *arr - 1;
-    }
-    
-    
-    TIM2->CCR1 = 10; // compare register
+    TIM2->PSC  = 16-1; // change this one for better blink
+    TIM2->ARR = 10001-1;
+    TIM2->CCR1 = ccr - 1; // compare register
 
 
     // set to 111, configure filter
@@ -51,7 +36,7 @@ void TIM3_PWM_Init(int16_t *arr, int16_t *incr)
     // GPIOA->MODER |= GPIO_MODER_MODE5_0;
     // GPIOA->MODER &= ~(GPIO_MODER_MODE5_1); 
 
-    GPIOA->AFR[0] = 5 << GPIO_AFRL_AFSEL5_Pos;
+    GPIOA->AFR[0] |= (5 << GPIO_AFRL_AFSEL5_Pos);
     
 }
 
@@ -99,16 +84,17 @@ int main(void)
     // GPIOC->PUPDR &= ~(GPIO_PUPDR_PUPD13_1); // Reset MSB => 0b…XXX0X
 
     // initial_interrupt();
-    TIM2_Int_Init();
-    // TIM3_PWM_Init();
+    // TIM2_Int_Init();
 
     
 
     const char text[] = "Hello, World!\n";
     int16_t data[] = {0, 123, 42, -399};
 
-    int16_t arr_incr = 100;
-    int16_t arr = 2;
+
+    int16_t ccr_incr = 1000;
+    int16_t ccr = 201;
+    TIM3_PWM_Init(ccr);
 
     
 
@@ -116,46 +102,34 @@ int main(void)
     {   
         // TIM3_PWM_Init(&arr, &arr_incr);
         // toggle_led_with_input();
-        char input = uart_rx_char();
-        uart_tx_char(input);
-        // if(input == '1')
-        // {
-                   
-        //   if(arr + arr_incr>1000)
-        //   {
-        //     continue;
-        //   }
-        //   arr += arr_incr;
-        //   // TIM3_PWM_Init(arr);
-            
-        // }else if(input == '0')
-        // {
-        //   if(arr -arr_incr<0){
-        //     continue;
-        //   }
-        //   arr -= arr_incr;
-        //   // TIM3_PWM_Init(arr);
-        // }
 
-        // if(input == '1')
-        // {
-        //   uart_tx_char(input);
-        //   if(arr + arr_incr>1000)
-        //   {
-        //     continue;
-        //   }
-        //   arr += arr_incr;
-        //   TIM3_PWM_Init(arr);
+        char buf[2];
+        char input = uart_rx_char();
+        buf[0] = input;
+        buf[1] = '\0';
+        uart_tx_str(buf);
+
+        if(input == '1')
+        {
+         
+          if(ccr + ccr_incr>10000)
+          {
+            continue;
+          }
+
+          ccr += ccr_incr;
+          TIM2->CCR1 = ccr;
             
-        // }else if(input == '0')
-        // {
-        //   uart_tx_char(input);
-        //   if(arr -arr_incr<0){
-        //     continue;
-        //   }
-        //   arr -= arr_incr;
-        //   TIM3_PWM_Init(arr);
-        // }
+        }else if(input == '0')
+        {
+          
+          if(ccr -ccr_incr < 0){
+            continue;
+          }
+          ccr -= ccr_incr;
+          TIM2->CCR1 = ccr;
+        }
+        
         /* Call your routines here */
 
         //GPIOA->ODR ^= GPIO_ODR_OD5;
