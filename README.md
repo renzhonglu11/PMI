@@ -6,3 +6,5 @@ Codes are not updated frequently in this branch!!!
 * [Exercise 2](https://github.com/renzhonglu11/PMI/tree/exe_2)
 * [Exercise 3](https://github.com/renzhonglu11/PMI/tree/exe_3)
 
+## Projects
+* [Project 1](https://github.com/renzhonglu11/PMI/tree/proj_1)
