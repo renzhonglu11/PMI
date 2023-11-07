@@ -3,31 +3,33 @@
 #include <stm32l0xx.h>
 #include <i2c.h>
 #include <mcp23017.h>
-
-#define MCP_IN_ADDR 0X40
-#define MCP_IN_ADDR_read 0X41
-#define GPIOB_ADDR 0x13
+#include <utils.h>
+#include <pmi_stddefs.h>
 
 int main(void)
 {
-    /* Call your initialisations here */
-    clocks_init_pmi();
-    uart_init_nucusb(115200);
+  /* Call your initialisations here */
+  clocks_init_pmi();
+  uart_init_nucusb(115200);
+  int32_t init_mcp = init_mcp23017();
+  uint8_t gpio = 0x04;
+  uint8_t gpio2 = 0x04;
+  gpio ^= 0xff;
+  gpio2 ^= 0xff;
+  uint8_t config_iodir2[] = {gpio};
+  uint8_t config_iodir3[] = {gpio2};
 
+  // uint8_t config_iodir[] = { 0x00 };
+  // write_mcp23017(MCP_IN_ADDR, MCP_IODIRB, config_iodir, sizeof(config_iodir)/sizeof(config_iodir[0]));
+  // write_mcp23017(MCP_IN_ADDR, MCP_IODIRA, config_iodir, sizeof(config_iodir)/sizeof(config_iodir[0]));
 
-    int32_t res = init_mcp23017();
-   
+  config_gpio(TRUE, 'A');
+  config_gpio(TRUE, 'B');
 
-    while(1)
-    {
-        /* Call your routines here */
-        // GPIOB->BSRR = GPIO_BSRR_BS_8;
-        // GPIOB->BSRR = GPIO_BSRR_BS_9;
-        uint8_t *buf;
-        *buf = 0x11;
+  while (1)
+  {
 
-        int32_t res = i2c_hw_tx_device(MCP_IN_ADDR, GPIOB_ADDR, &buf, 2);
-        int a =1;
-        systick_delay_ms(1000);
-    }
+    int32_t b = turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
+    int32_t a = turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
+  }
 }
