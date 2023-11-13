@@ -7,3 +7,11 @@ Base address: `0x20`
 
 ## I2C
 Address Register: `Device address` + `Register address`
+
+
+## TODO
+- [x] interrupt
+- [x] GPIO
+- [x] button
+- [x] LED
+- [ ] loop LED
