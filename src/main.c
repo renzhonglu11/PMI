@@ -14,7 +14,7 @@ int main(void)
   int32_t init_mcp = init_mcp23017();
   initial_interrupt();
 
-  uint8_t gpio = 0x00;
+  uint8_t gpio = 0x00;  // 0000 0100
   uint8_t gpio2 = 0x00;
   gpio ^= 0xff;
   gpio2 ^= 0xff;
@@ -32,7 +32,17 @@ int main(void)
   
   while (1)
   {
-
     
+    // LIGHT a = D4_D9; 
+    // // uint8_t gpio5 = 0x01;
+    // a ^= 0xff;
+    // uint8_t config_iodir4[] = {a};
+
+
+    // turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir4, ARRAY_SIZE(config_iodir4));
+
+    // turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir4, ARRAY_SIZE(config_iodir4));
+    led_loop();
+
   }
 }

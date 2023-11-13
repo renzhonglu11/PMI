@@ -10,6 +10,16 @@
 #define MCP_IODIRB (uint8_t)0x01
 #define MCP_IODIRA (uint8_t)0x00
 
+// the led of 0x04 is not used
+typedef enum
+{
+    D1_D6= 0x01,
+    D2_D7 = 0x02,
+    D3_D8 = 0x04,
+    D4_D9 = 0x08,
+    D5_D10 = 0x10,
+    
+}LIGHT;
 
 
 
@@ -20,5 +30,7 @@ int32_t initial_interrupt();
 int32_t init_mcp23017();
 int32_t write_mcp23017(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size);
 int32_t turn_on_led(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size);
+int32_t led_loop();
+
 
 #endif /* MCP23017_H */
