@@ -110,11 +110,10 @@ void EXTI2_3_IRQHandler()
     }
 }
 
-int8_t counter = 0;
 
-int32_t led_loop()
+void _turn_off_leds()
 {
-  // using for loop to turn on and off each led
+  
   uint8_t gpio = 0x00;  // 0000 0100
   uint8_t gpio2 = 0x00;
   gpio ^= 0xff;
@@ -123,21 +122,24 @@ int32_t led_loop()
   uint8_t config_iodir3[] = {gpio2};
   int32_t b = turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
   int32_t a = turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
-  
+}
 
+int32_t counter = 0;
 
+int32_t led_loop()
+{
+  // using for loop to turn on and off each led
 
-  LIGHT lights[] = {D3_D8, D2_D7, D1_D6, D4_D9,D1_D6, D5_D10, D2_D7, D4_D9, D5_D10};
+  LIGHT lights[] = {D3_D8, D2_D7, D1_D9,D1_D9, D4_D6, D5_D10, D2_D7, D4_D6, D5_D10};
   int8_t len_lights =  ARRAY_SIZE(lights); 
   
-  counter++;
   int cur_position = counter % len_lights; 
 
-  LIGHT cur_led = lights[cur_position];
+  int8_t cur_led = lights[cur_position];
   
   int8_t cur_gpio = 0;
 
-  if(cur_led >3 && cur_led <8)
+  if(cur_position >=3 && cur_position <7)
   {
     cur_gpio = MCP_GPIOB_ADDR;
    
@@ -154,8 +156,10 @@ int32_t led_loop()
 
 
   turn_on_led(MCP_IN_ADDR, cur_gpio, config_iodir4, ARRAY_SIZE(config_iodir4)); 
-  
-  systick_delay_ms(400);
+  systick_delay_ms(50);
+  _turn_off_leds();
+  counter++;
+  systick_delay_ms(50);
 
 
 }

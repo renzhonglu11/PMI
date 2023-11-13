@@ -32,9 +32,9 @@ int main(void)
   
   while (1)
   {
-    
+    // int8_t a = D4_D9;
     // LIGHT a = D4_D9; 
-    // // uint8_t gpio5 = 0x01;
+    // // // uint8_t gpio5 = 0x01;
     // a ^= 0xff;
     // uint8_t config_iodir4[] = {a};
 

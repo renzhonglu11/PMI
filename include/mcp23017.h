@@ -13,10 +13,10 @@
 // the led of 0x04 is not used
 typedef enum
 {
-    D1_D6= 0x01,
+    D1_D9= 0x01,
     D2_D7 = 0x02,
     D3_D8 = 0x04,
-    D4_D9 = 0x08,
+    D4_D6 = 0x08,
     D5_D10 = 0x10,
     
 }LIGHT;
