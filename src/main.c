@@ -5,6 +5,8 @@
 #include <mcp23017.h>
 #include <utils.h>
 #include <pmi_stddefs.h>
+#include <ili9341.h>
+#include <bmp_go_49x56.h>
 
 int main(void)
 {
@@ -12,6 +14,8 @@ int main(void)
   clocks_init_pmi();
   uart_init_nucusb(115200);
   int32_t init_mcp = init_mcp23017();
+  ili9341_init(ILI9341_ORIENTATION_0);
+
   initial_interrupt();
 
   uint8_t gpio = 0x00;  // 0000 0100
@@ -30,19 +34,21 @@ int main(void)
   int32_t b = turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
   int32_t a = turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
   
+  // draw pciture to led
+  int8_t x0 = 20;
+  int8_t y0 = 20;
+  int8_t width = 49;
+  int8_t height = 56;
+
+  
+
+
   while (1)
   {
-    // int8_t a = D4_D9;
-    // LIGHT a = D4_D9; 
-    // // // uint8_t gpio5 = 0x01;
-    // a ^= 0xff;
-    // uint8_t config_iodir4[] = {a};
 
+    // led_loop();
 
-    // turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir4, ARRAY_SIZE(config_iodir4));
-
-    // turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir4, ARRAY_SIZE(config_iodir4));
-    led_loop();
-
+    ili9341_draw_bmp_h(x0, y0, width, height, go_49x56,  ILI9341_COLOR_GREEN,  ILI9341_COLOR_BLACK);
+    
   }
 }

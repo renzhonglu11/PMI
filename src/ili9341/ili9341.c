@@ -848,5 +848,57 @@ void ili9341_draw_bmp_h(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
                         uint8_t *bmp_data, uint16_t color, uint16_t bgcolor)
 {
   // TODO: Implement the picture display function
+
+
+      for (int c = 0; c < h; c++) {
+        for (int r = 0; r < w; r++) {
+            // Calculate the index in the 1D array
+             int index = (c * (w / 8)) + (r / 8);
+
+            // Extract the bit for the current pixel
+            int bitPosition = 7 - (r % 8); // Most significant bit is on the left
+            uint8_t bit = (bmp_data[index] >> bitPosition) & 0x01;
+            // Access the individual bytes of the current pixel
+            if(bit)
+            {
+              bmp_data[index] = color;
+            }else
+            {
+              bmp_data[index] = bgcolor;
+            }
+
+            // Do something with the RGB values if needed
+        
+        }
+    }
+
+
+  //  for (int c = 0; c < h; c++) {
+  //       for (int r = 0; r < w; r++) {
+  //           // Access the pixel at position (x, y)
+  //           // bmp_data[c * w + r] = color;
+            
+  //            // Calculate the index in the 1D array
+  //            int index = (c * (w / 8)) + (r / 8);
+           
+
+  //           // Extract the bit for the current pixel
+  //           int bitPosition = 7 - (r % 8); // Most significant bit is on the left
+
+  //           uint8_t bit = (bmp_data[index] >> bitPosition) & 0x01;
+  //           if(bit)
+  //           {
+  //             bmp_data[index] = color;
+  //           }else
+  //           {
+  //             bmp_data[index] = bgcolor;
+  //           }
+  //           // Do something with the pixel, for example, print its RGB values
+            
+  //       }
+  //   }
+
+
+  // ili9341_pixel_set(uint16_t x, uint16_t y, uint16_t color);  // set pixel to corresponding color
   
 }
