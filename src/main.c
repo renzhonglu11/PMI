@@ -15,7 +15,8 @@ int main(void)
   uart_init_nucusb(115200);
   int32_t init_mcp = init_mcp23017();
   ili9341_init(ILI9341_ORIENTATION_0);
-
+  ili9341_enable(1);
+  
   initial_interrupt();
 
   uint8_t gpio = 0x00;  // 0000 0100
@@ -48,7 +49,7 @@ int main(void)
 
     // led_loop();
 
-    ili9341_draw_bmp_h(x0, y0, width, height, go_49x56,  ILI9341_COLOR_GREEN,  ILI9341_COLOR_BLACK);
+    ili9341_draw_bmp_h(x0, y0, width, height, (uint8_t*)go_49x56,  ILI9341_COLOR_GREEN,  ILI9341_COLOR_BLACK);
     
   }
 }
