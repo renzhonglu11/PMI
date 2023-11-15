@@ -7,6 +7,7 @@
 #include <pmi_stddefs.h>
 #include <ili9341.h>
 #include <bmp_go_49x56.h>
+#include <bmp_stop_51x56.h>
 
 int main(void)
 {
@@ -16,7 +17,7 @@ int main(void)
   int32_t init_mcp = init_mcp23017();
   ili9341_init(ILI9341_ORIENTATION_0);
   ili9341_enable(1);
-  
+
   initial_interrupt();
 
   uint8_t gpio = 0x00;  // 0000 0100
@@ -40,6 +41,9 @@ int main(void)
   int8_t y0 = 20;
   int8_t width = 49;
   int8_t height = 56;
+  int8_t x1 = 20;
+  int8_t y1 = (20+56+20);
+
 
   
 
@@ -50,6 +54,7 @@ int main(void)
     // led_loop();
 
     ili9341_draw_bmp_h(x0, y0, width, height, (uint8_t*)go_49x56,  ILI9341_COLOR_GREEN,  ILI9341_COLOR_BLACK);
+    ili9341_draw_bmp_h(x1, y1, width, height, (uint8_t*)stop_51x56, ILI9341_COLOR_RED,  ILI9341_COLOR_BLACK);
     
   }
 }
