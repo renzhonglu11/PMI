@@ -88,6 +88,7 @@ void toggle_test()
 
 void EXTI2_3_IRQHandler()
 {
+  // PB2 for SW1
   uint8_t gpio = 0x00;
 
   if(EXTI->PR & EXTI_PR_PIF2) // pending bit of EXTI line 2 is set
@@ -110,6 +111,12 @@ void EXTI2_3_IRQHandler()
     }
 }
 
+void EXTI0_1_IRQHandler(void)
+{
+  // PB1 for SW2
+  // TODO: implment interrupt handler for SW2
+  
+}
 
 void _turn_off_leds()
 {
@@ -129,6 +136,8 @@ int32_t counter = 0;
 int32_t led_loop()
 {
   // using for loop to turn on and off each led
+  // TODO: use interrupt to turn on and off each led
+  // TODO: use interrupt to reverse the direction of the led loop
 
   LIGHT lights[] = {D3_D8, D2_D7, D1_D9,D1_D9, D4_D6, D5_D10, D2_D7, D4_D6, D5_D10};
   int8_t len_lights =  ARRAY_SIZE(lights); 

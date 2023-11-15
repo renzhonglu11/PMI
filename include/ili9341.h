@@ -4,35 +4,35 @@
 
 /* ILI9341 pre-defined colors in RGB565 (16-bit) format
                                     RGB565  RGB888 (24-bit) */
-#define ILI9341_COLOR_BLACK         0x0000  //   0,   0,   0
-#define ILI9341_COLOR_NAVY          0x000F  //   0,   0, 123
-#define ILI9341_COLOR_DARKGREEN     0x03E0  //   0, 125,   0
-#define ILI9341_COLOR_DARKCYAN      0x03EF  //   0, 125, 123
-#define ILI9341_COLOR_MAROON        0x7800  // 123,   0,   0
-#define ILI9341_COLOR_PURPLE        0x780F  // 123,   0, 123
-#define ILI9341_COLOR_OLIVE         0x7BE0  // 123, 125,   0
-#define ILI9341_COLOR_LIGHTGREY     0xC618  // 198, 195, 198
-#define ILI9341_COLOR_DARKGREY      0x7BEF  // 123, 125, 123
-#define ILI9341_COLOR_BLUE          0x001F  //   0,   0, 255
-#define ILI9341_COLOR_GREEN         0x07E0  //   0, 255,   0
-#define ILI9341_COLOR_CYAN          0x07FF  //   0, 255, 255
-#define ILI9341_COLOR_RED           0xF800  // 255,   0,   0
-#define ILI9341_COLOR_MAGENTA       0xF81F  // 255,   0, 255
-#define ILI9341_COLOR_YELLOW        0xFFE0  // 255, 255,   0
-#define ILI9341_COLOR_WHITE         0xFFFF  // 255, 255, 255
-#define ILI9341_COLOR_ORANGE        0xFD20  // 255, 165,   0
-#define ILI9341_COLOR_GREENYELLOW   0xAFE5  // 173, 255,  41
-#define ILI9341_COLOR_PINK          0xFC18  // 255, 130, 198
+#define ILI9341_COLOR_BLACK 0x0000       //   0,   0,   0
+#define ILI9341_COLOR_NAVY 0x000F        //   0,   0, 123
+#define ILI9341_COLOR_DARKGREEN 0x03E0   //   0, 125,   0
+#define ILI9341_COLOR_DARKCYAN 0x03EF    //   0, 125, 123
+#define ILI9341_COLOR_MAROON 0x7800      // 123,   0,   0
+#define ILI9341_COLOR_PURPLE 0x780F      // 123,   0, 123
+#define ILI9341_COLOR_OLIVE 0x7BE0       // 123, 125,   0
+#define ILI9341_COLOR_LIGHTGREY 0xC618   // 198, 195, 198
+#define ILI9341_COLOR_DARKGREY 0x7BEF    // 123, 125, 123
+#define ILI9341_COLOR_BLUE 0x001F        //   0,   0, 255
+#define ILI9341_COLOR_GREEN 0x07E0       //   0, 255,   0
+#define ILI9341_COLOR_CYAN 0x07FF        //   0, 255, 255
+#define ILI9341_COLOR_RED 0xF800         // 255,   0,   0
+#define ILI9341_COLOR_MAGENTA 0xF81F     // 255,   0, 255
+#define ILI9341_COLOR_YELLOW 0xFFE0      // 255, 255,   0
+#define ILI9341_COLOR_WHITE 0xFFFF       // 255, 255, 255
+#define ILI9341_COLOR_ORANGE 0xFD20      // 255, 165,   0
+#define ILI9341_COLOR_GREENYELLOW 0xAFE5 // 173, 255,  41
+#define ILI9341_COLOR_PINK 0xFC18        // 255, 130, 198
 
 /**
  * @brief Display orientation
  */
 enum ILI9341_ORIENTATION_E
 {
-    ILI9341_ORIENTATION_0,
-    ILI9341_ORIENTATION_90,
-    ILI9341_ORIENTATION_180,
-    ILI9341_ORIENTATION_270
+  ILI9341_ORIENTATION_0,
+  ILI9341_ORIENTATION_90,
+  ILI9341_ORIENTATION_180,
+  ILI9341_ORIENTATION_270
 };
 
 /**
@@ -40,17 +40,17 @@ enum ILI9341_ORIENTATION_E
  */
 struct display_info_s
 {
-    uint16_t width;
-    uint16_t height;
+  uint16_t width;
+  uint16_t height;
 
-    uint16_t x_p;
-    uint16_t y_p;
+  uint16_t x_p;
+  uint16_t y_p;
 
-    uint8_t orientation;
-    uint8_t column;
+  uint8_t orientation;
+  uint8_t column;
 
-    int16_t font_width;
-    int16_t font_height;
+  int16_t font_width;
+  int16_t font_height;
 };
 
 /* ili9341.c */
@@ -78,7 +78,7 @@ void ili9341_pixel_set(uint16_t x, uint16_t y, uint16_t color);
  * @param[in] color Color of the rectangle
  */
 void ili9341_rect_fill(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-    uint16_t color);
+                       uint16_t color);
 
 /**
  * @brief Sets display orientation
@@ -144,7 +144,7 @@ void ili9341_str_clear(uint16_t num_chars, uint16_t color);
  * @param color[in] Color @ref ILI9341_COLOR_x
  */
 void ili9341_line_draw(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
-    uint16_t color);
+                       uint16_t color);
 
 /**
  * @brief Enables display
@@ -176,5 +176,17 @@ uint32_t ili9341_test(void);
  * @brief Prints an endless matrix like screen routine
  */
 void ili9341_enterthematrix(void);
+
+
+/// @brief draw the picture to the screen
+/// @param x position x of the picture
+/// @param y position y of the picture
+/// @param w wide of the picture
+/// @param h height of the picture
+/// @param bmp_data bitmap array (bits that represent the picture)
+/// @param color color of the picture
+/// @param bgcolor background color
+void ili9341_draw_bmp_h(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                        uint8_t *bmp_data, uint16_t color, uint16_t bgcolor);
 
 #endif /* ILI9341_H */

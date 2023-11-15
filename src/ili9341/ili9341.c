@@ -6,7 +6,7 @@
  */
 
 #include "fonts/gfxfont.h"
-#define PROGMEM     // Necessary to override Atmels megaAVR PROGMEM key
+#define PROGMEM // Necessary to override Atmels megaAVR PROGMEM key
 #include "fonts/FreeMonoBold12pt7b.h"
 #include "fonts/FreeMonoBold9pt7b.h"
 #include "fonts/FreeMono12pt7b.h"
@@ -21,120 +21,157 @@
 #define abs(x) (((x) < 0) ? -(x) : (x))
 
 /* Swaps bytes in 16 bit datatype */
-#define swap_vals_int16(a, b)   \
-do                              \
-{                               \
-    int16_t t = a;              \
-    a = b;                      \
-    b = t;                      \
-} while (0)
+#define swap_vals_int16(a, b) \
+  do                          \
+  {                           \
+    int16_t t = a;            \
+    a = b;                    \
+    b = t;                    \
+  } while (0)
 
 /* Constant offset for y advance to decrease line distance */
-#define Y_ADVANCE_OFFS      2
+#define Y_ADVANCE_OFFS 2
 
 /* ILI9341 command reference */
-#define TFTWIDTH        240
-#define TFTHEIGHT       320
+#define TFTWIDTH 240
+#define TFTHEIGHT 320
 
-#define CMD_NOP         0x00
-#define CMD_SWRESET     0x01
-#define CMD_RDDID       0xD3
-#define CMD_RDDST       0x09
+#define CMD_NOP 0x00
+#define CMD_SWRESET 0x01
+#define CMD_RDDID 0xD3
+#define CMD_RDDST 0x09
 
-#define CMD_SLPIN       0x10
-#define CMD_SLPOUT      0x11
-#define CMD_PTLON       0x12
-#define CMD_NORON       0x13
+#define CMD_SLPIN 0x10
+#define CMD_SLPOUT 0x11
+#define CMD_PTLON 0x12
+#define CMD_NORON 0x13
 
-#define CMD_RDMODE      0x0A
-#define CMD_RDMADCTL    0x0B
-#define CMD_RDPIXFMT    0x0C
-#define CMD_RDIMGFMT    0x0D
-#define CMD_RDSELFDIAG  0x0F
+#define CMD_RDMODE 0x0A
+#define CMD_RDMADCTL 0x0B
+#define CMD_RDPIXFMT 0x0C
+#define CMD_RDIMGFMT 0x0D
+#define CMD_RDSELFDIAG 0x0F
 
-#define CMD_INVOFF      0x20
-#define CMD_INVON       0x21
-#define CMD_GAMMASET    0x26
-#define CMD_DISPOFF     0x28
-#define CMD_DISPON      0x29
+#define CMD_INVOFF 0x20
+#define CMD_INVON 0x21
+#define CMD_GAMMASET 0x26
+#define CMD_DISPOFF 0x28
+#define CMD_DISPON 0x29
 
-#define CMD_CASET       0x2A
-#define CMD_PASET       0x2B
-#define CMD_RAMWR       0x2C
-#define CMD_RAMRD       0x2E
+#define CMD_CASET 0x2A
+#define CMD_PASET 0x2B
+#define CMD_RAMWR 0x2C
+#define CMD_RAMRD 0x2E
 
-#define CMD_PTLAR       0x30
-#define CMD_MADCTL      0x36
-#define CMD_PIXFMT      0x3A
+#define CMD_PTLAR 0x30
+#define CMD_MADCTL 0x36
+#define CMD_PIXFMT 0x3A
 
-#define CMD_FRMCTR1     0xB1
-#define CMD_FRMCTR2     0xB2
-#define CMD_FRMCTR3     0xB3
-#define CMD_INVCTR      0xB4
-#define CMD_DFUNCTR     0xB6
+#define CMD_FRMCTR1 0xB1
+#define CMD_FRMCTR2 0xB2
+#define CMD_FRMCTR3 0xB3
+#define CMD_INVCTR 0xB4
+#define CMD_DFUNCTR 0xB6
 
-#define CMD_PWCTR1      0xC0
-#define CMD_PWCTR2      0xC1
-#define CMD_PWCTR3      0xC2
-#define CMD_PWCTR4      0xC3
-#define CMD_PWCTR5      0xC4
-#define CMD_VMCTR1      0xC5
-#define CMD_VMCTR2      0xC7
+#define CMD_PWCTR1 0xC0
+#define CMD_PWCTR2 0xC1
+#define CMD_PWCTR3 0xC2
+#define CMD_PWCTR4 0xC3
+#define CMD_PWCTR5 0xC4
+#define CMD_VMCTR1 0xC5
+#define CMD_VMCTR2 0xC7
 
-#define CMD_RDID1       0xDA
-#define CMD_RDID2       0xDB
-#define CMD_RDID3       0xDC
-#define CMD_RDID4       0xDD
+#define CMD_RDID1 0xDA
+#define CMD_RDID2 0xDB
+#define CMD_RDID3 0xDC
+#define CMD_RDID4 0xDD
 
-#define CMD_GMCTRP1     0xE0
-#define CMD_GMCTRN1     0xE1
+#define CMD_GMCTRP1 0xE0
+#define CMD_GMCTRN1 0xE1
 
-#define MADCTL_MY       0x80
-#define MADCTL_MX       0x40
-#define MADCTL_MV       0x20
-#define MADCTL_ML       0x10
-#define MADCTL_RGB      0x00
-#define MADCTL_BGR      0x08
-#define MADCTL_MH       0x04
+#define MADCTL_MY 0x80
+#define MADCTL_MX 0x40
+#define MADCTL_MV 0x20
+#define MADCTL_ML 0x10
+#define MADCTL_RGB 0x00
+#define MADCTL_BGR 0x08
+#define MADCTL_MH 0x04
 
-#define CMD_PWCTR6      0xFC
-#define _MW 0x2C    // Memory write
-#define _SC 0x2A    // Set column
-#define _SP 0x2B    // Set Page
+#define CMD_PWCTR6 0xFC
+#define _MW 0x2C // Memory write
+#define _SC 0x2A // Set column
+#define _SP 0x2B // Set Page
 #define TFTLCD_DELAY8 0x7F
 #define TABLE_END 0xFF
 
 /* Initial values */
 static const uint8_t tbl_init_values[] = {
-    0x26, 1, 0x01,              // Gamma curve select -> gamma curve 1
-    0x34, 0,                    // Tearing effect line OFF
-    0x36, 1, 0x08,              // Memory access control
-    0x3A, 1, 0x55,              // Pixel format set -> 16 bit/pixel
-    0xB0, 1, 0x00,              // RGB IF signal control -> dont use RGB IF
-    0xB1, 2, 0x00, 0x1B,        // Frame rate control -> 70 Hz, full color mode
-    0xB4, 1, 0x00,              // Inversion control -> No inversion
-    0xB6, 3, 0x0A, 0xA0, 0x27,  // Display Function [0A 82 27 XX]    .kbv SS=1
-    0xC0, 1, 0x2A,              // Power control 1 -> set GVDD level to 4.95V
-    0xC5, 2, 0x3F, 0x3C,        // VCOM 1 [31 3C]
-    0xC7, 1, 0xB5,              // VCOM 2 [C0]
-    0xF6, 3, 0x00, 0x00, 0x00,
+    0x26,
+    1,
+    0x01, // Gamma curve select -> gamma curve 1
+    0x34,
+    0, // Tearing effect line OFF
+    0x36,
+    1,
+    0x08, // Memory access control
+    0x3A,
+    1,
+    0x55, // Pixel format set -> 16 bit/pixel
+    0xB0,
+    1,
+    0x00, // RGB IF signal control -> dont use RGB IF
+    0xB1,
+    2,
+    0x00,
+    0x1B, // Frame rate control -> 70 Hz, full color mode
+    0xB4,
+    1,
+    0x00, // Inversion control -> No inversion
+    0xB6,
+    3,
+    0x0A,
+    0xA0,
+    0x27, // Display Function [0A 82 27 XX]    .kbv SS=1
+    0xC0,
+    1,
+    0x2A, // Power control 1 -> set GVDD level to 4.95V
+    0xC5,
+    2,
+    0x3F,
+    0x3C, // VCOM 1 [31 3C]
+    0xC7,
+    1,
+    0xB5, // VCOM 2 [C0]
+    0xF6,
+    3,
+    0x00,
+    0x00,
+    0x00,
     TABLE_END,
 };
 
 /* Reset off values */
 static const uint8_t tbl_reset_off[] = {
-    0x01, 0,            // Soft Reset
-    TFTLCD_DELAY8, 150, // .kbv powers up with ONLY reset, sleep out, disp. on
-    0x28, 0,            // Display Off
-    0x3A, 1, 0x55,      // Pixel format is 565 = 16 bit per pixel
+    0x01,
+    0, // Soft Reset
+    TFTLCD_DELAY8,
+    150, // .kbv powers up with ONLY reset, sleep out, disp. on
+    0x28,
+    0, // Display Off
+    0x3A,
+    1,
+    0x55, // Pixel format is 565 = 16 bit per pixel
     TABLE_END,
 };
 
 /* Wake up values */
 static const uint8_t tbl_wake_on[] = {
-    0x11, 0,            // Sleep out
-    TFTLCD_DELAY8, 150,
-    0x29, 0,            // Display on
+    0x11,
+    0, // Sleep out
+    TFTLCD_DELAY8,
+    150,
+    0x29,
+    0, // Display on
     TABLE_END,
 };
 
@@ -142,10 +179,9 @@ static const uint8_t tbl_wake_on[] = {
  * @brief Common display infos
  */
 static struct display_info_s dspi =
-{
-    .width = TFTWIDTH,
-    .height = TFTHEIGHT
-};
+    {
+        .width = TFTWIDTH,
+        .height = TFTHEIGHT};
 
 /**
  * @brief Get current display settings
@@ -153,7 +189,7 @@ static struct display_info_s dspi =
  */
 struct display_info_s ili9341_display_info_get(void)
 {
-    return dspi;
+  return dspi;
 }
 
 /* Used font */
@@ -166,16 +202,16 @@ const GFXfont *font;
  */
 static uint32_t font_set(const GFXfont *fnt)
 {
-    if (!fnt)
-    {
-        return RC_PARAM_INVALID;
-    }
-    font = fnt;
+  if (!fnt)
+  {
+    return RC_PARAM_INVALID;
+  }
+  font = fnt;
 
-    dspi.font_height = font->yAdvance;
-    dspi.font_width = font->glyph->xAdvance;
+  dspi.font_height = font->yAdvance;
+  dspi.font_width = font->glyph->xAdvance;
 
-    return RC_SUCC;
+  return RC_SUCC;
 }
 
 /**
@@ -184,15 +220,15 @@ static uint32_t font_set(const GFXfont *fnt)
  */
 static void cmd_tx(uint8_t cmd)
 {
-    io_cs_set(IO_STATE_ACTIVATE);
-    io_wr_set(IO_STATE_ACTIVATE);
-    io_rs_set(IO_RS_CMD);
+  io_cs_set(IO_STATE_ACTIVATE);
+  io_wr_set(IO_STATE_ACTIVATE);
+  io_rs_set(IO_RS_CMD);
 
-    io_dpins_set(cmd);
+  io_dpins_set(cmd);
 
-    io_wr_set(IO_STATE_RELEASE);
-    io_rs_set(IO_RS_DATA);
-    io_cs_set(IO_STATE_RELEASE);
+  io_wr_set(IO_STATE_RELEASE);
+  io_rs_set(IO_RS_DATA);
+  io_cs_set(IO_STATE_RELEASE);
 }
 
 /**
@@ -202,18 +238,18 @@ static void cmd_tx(uint8_t cmd)
  */
 static void data8_tx(uint8_t *data, uint8_t size)
 {
-    uint16_t i;
+  uint16_t i;
 
-    io_cs_set(IO_STATE_ACTIVATE);
+  io_cs_set(IO_STATE_ACTIVATE);
 
-    for (i = 0; i < size; i++)
-    {
-        io_wr_set(IO_STATE_ACTIVATE);
-        io_dpins_set(*data++);
-        io_wr_set(IO_STATE_RELEASE);
-    }
+  for (i = 0; i < size; i++)
+  {
+    io_wr_set(IO_STATE_ACTIVATE);
+    io_dpins_set(*data++);
+    io_wr_set(IO_STATE_RELEASE);
+  }
 
-    io_cs_set(IO_STATE_RELEASE);
+  io_cs_set(IO_STATE_RELEASE);
 }
 
 /**
@@ -223,25 +259,25 @@ static void data8_tx(uint8_t *data, uint8_t size)
  */
 static void data16_tx(uint16_t *data, uint8_t size)
 {
-    uint16_t i;
+  uint16_t i;
 
-    io_cs_set(1);
+  io_cs_set(1);
 
-    for (i = 0; i < size; i++)
-    {
-        io_wr_set(IO_STATE_ACTIVATE);
+  for (i = 0; i < size; i++)
+  {
+    io_wr_set(IO_STATE_ACTIVATE);
 
-        io_dpins_set(*data >> 8);
+    io_dpins_set(*data >> 8);
 
-        io_wr_set(IO_STATE_RELEASE);
-        io_wr_set(IO_STATE_ACTIVATE);
+    io_wr_set(IO_STATE_RELEASE);
+    io_wr_set(IO_STATE_ACTIVATE);
 
-        io_dpins_set(*data & 0xFF);
+    io_dpins_set(*data & 0xFF);
 
-        io_wr_set(IO_STATE_RELEASE);
-    }
+    io_wr_set(IO_STATE_RELEASE);
+  }
 
-    io_cs_set(IO_STATE_RELEASE);
+  io_cs_set(IO_STATE_RELEASE);
 }
 
 /**
@@ -252,18 +288,18 @@ static void data16_tx(uint16_t *data, uint8_t size)
  */
 static void cmd_data_tx(uint8_t cmd, uint8_t *data, uint8_t size)
 {
-    io_cs_set(IO_STATE_ACTIVATE);
-    io_wr_set(IO_STATE_ACTIVATE);
-    io_rs_set(IO_STATE_ACTIVATE);
+  io_cs_set(IO_STATE_ACTIVATE);
+  io_wr_set(IO_STATE_ACTIVATE);
+  io_rs_set(IO_STATE_ACTIVATE);
 
-    io_dpins_set(cmd);
+  io_dpins_set(cmd);
 
-    io_wr_set(IO_STATE_RELEASE);
-    io_rs_set(IO_STATE_RELEASE);
+  io_wr_set(IO_STATE_RELEASE);
+  io_rs_set(IO_STATE_RELEASE);
 
-    data8_tx(data, size);
+  data8_tx(data, size);
 
-    io_cs_set(IO_STATE_RELEASE);
+  io_cs_set(IO_STATE_RELEASE);
 }
 
 /**
@@ -275,13 +311,13 @@ static void cmd_data_tx(uint8_t cmd, uint8_t *data, uint8_t size)
  * @param[in] y1 y coordinate of lower right corner of rectangle
  */
 static void rect_coords_set(uint16_t x0, uint16_t y0,
-    uint16_t x1, uint16_t y1)
+                            uint16_t x1, uint16_t y1)
 {
-    uint8_t x_dat[] = {x0 >> 8, x0, x1 >> 8, x1};
-    uint8_t y_dat[] = {y0 >> 8, y0, y1 >> 8, y1};
+  uint8_t x_dat[] = {x0 >> 8, x0, x1 >> 8, x1};
+  uint8_t y_dat[] = {y0 >> 8, y0, y1 >> 8, y1};
 
-    cmd_data_tx(CMD_CASET, x_dat, sizeof(x_dat));
-    cmd_data_tx(CMD_PASET, y_dat, sizeof(y_dat));
+  cmd_data_tx(CMD_CASET, x_dat, sizeof(x_dat));
+  cmd_data_tx(CMD_PASET, y_dat, sizeof(y_dat));
 }
 
 /**
@@ -292,11 +328,11 @@ static void rect_coords_set(uint16_t x0, uint16_t y0,
  */
 void ili9341_pixel_set(uint16_t x, uint16_t y, uint16_t color)
 {
-    rect_coords_set(x, y, x, y);
+  rect_coords_set(x, y, x, y);
 
-    cmd_tx(CMD_RAMWR);
+  cmd_tx(CMD_RAMWR);
 
-    data16_tx(&color, 1);
+  data16_tx(&color, 1);
 }
 
 /**
@@ -308,21 +344,21 @@ void ili9341_pixel_set(uint16_t x, uint16_t y, uint16_t color)
  * @param[in] color Color of the rectangle
  */
 void ili9341_rect_fill(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-    uint16_t color)
+                       uint16_t color)
 {
-    uint16_t h_cnt;
-    rect_coords_set(x, y, x + width - 1, y + height - 1);
+  uint16_t h_cnt;
+  rect_coords_set(x, y, x + width - 1, y + height - 1);
 
-    cmd_tx(CMD_RAMWR);
+  cmd_tx(CMD_RAMWR);
 
-    while(width-- > 0)
+  while (width-- > 0)
+  {
+    h_cnt = height;
+    while (h_cnt-- > 0)
     {
-        h_cnt = height;
-        while (h_cnt-- > 0)
-        {
-            data16_tx(&color, 1);
-        }
+      data16_tx(&color, 1);
     }
+  }
 }
 
 /**
@@ -331,37 +367,37 @@ void ili9341_rect_fill(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
  */
 static void cmd_table_do(const uint8_t *table)
 {
-    const uint8_t *p = table;
-    uint8_t cmd;
-    uint8_t size;
+  const uint8_t *p = table;
+  uint8_t cmd;
+  uint8_t size;
 
-    while(1)
+  while (1)
+  {
+    /* Read first table entry */
+    cmd = *p++;
+    if (cmd == TABLE_END)
     {
-        /* Read first table entry */
-        cmd = *p++;
-        if(cmd == TABLE_END)
-        {
-            return;
-        }
-        else if (cmd == TFTLCD_DELAY8)
-        {
-            p++;
-        }
-        else
-        {
-            /**
-             * If first entry was neither TABLE_END nor TFTLCDDELAY
-             *  it is a display command with N parameters.
-            **/
-            size = *p++;
-            cmd_data_tx(cmd, (uint8_t *) p, size);
-            /**
-             * Increment pointer by N so it skips the
-             *  next N parameters and points to the next command
-             **/
-            p = p + size;
-        }
+      return;
     }
+    else if (cmd == TFTLCD_DELAY8)
+    {
+      p++;
+    }
+    else
+    {
+      /**
+       * If first entry was neither TABLE_END nor TFTLCDDELAY
+       *  it is a display command with N parameters.
+       **/
+      size = *p++;
+      cmd_data_tx(cmd, (uint8_t *)p, size);
+      /**
+       * Increment pointer by N so it skips the
+       *  next N parameters and points to the next command
+       **/
+      p = p + size;
+    }
+  }
 }
 
 /**
@@ -370,43 +406,43 @@ static void cmd_table_do(const uint8_t *table)
  */
 void ili9341_rotation_set(uint8_t orientation)
 {
-    uint8_t madctl_reg;
+  uint8_t madctl_reg;
 
-    dspi.x_p = 0;
-    dspi.y_p = 0;
+  dspi.x_p = 0;
+  dspi.y_p = 0;
 
-    dspi.orientation = orientation;
-    switch (dspi.orientation)
-    {
-        case ILI9341_ORIENTATION_0:
-            madctl_reg = (MADCTL_BGR);
-            dspi.width  = TFTWIDTH;
-            dspi.height = TFTHEIGHT;
-            break;
+  dspi.orientation = orientation;
+  switch (dspi.orientation)
+  {
+  case ILI9341_ORIENTATION_0:
+    madctl_reg = (MADCTL_BGR);
+    dspi.width = TFTWIDTH;
+    dspi.height = TFTHEIGHT;
+    break;
 
-        case ILI9341_ORIENTATION_90:
-            madctl_reg = (MADCTL_MV | MADCTL_MX | MADCTL_BGR);
-            dspi.width  = TFTHEIGHT;
-            dspi.height = TFTWIDTH;
-            break;
+  case ILI9341_ORIENTATION_90:
+    madctl_reg = (MADCTL_MV | MADCTL_MX | MADCTL_BGR);
+    dspi.width = TFTHEIGHT;
+    dspi.height = TFTWIDTH;
+    break;
 
-        case ILI9341_ORIENTATION_180:
-            madctl_reg = (MADCTL_MY | MADCTL_MX | MADCTL_BGR);
-            dspi.width  = TFTWIDTH;
-            dspi.height = TFTHEIGHT;
-            break;
+  case ILI9341_ORIENTATION_180:
+    madctl_reg = (MADCTL_MY | MADCTL_MX | MADCTL_BGR);
+    dspi.width = TFTWIDTH;
+    dspi.height = TFTHEIGHT;
+    break;
 
-        case ILI9341_ORIENTATION_270:
-            madctl_reg = (MADCTL_MY | MADCTL_MV | MADCTL_BGR);
-            dspi.width  = TFTHEIGHT;
-            dspi.height = TFTWIDTH;
-            break;
+  case ILI9341_ORIENTATION_270:
+    madctl_reg = (MADCTL_MY | MADCTL_MV | MADCTL_BGR);
+    dspi.width = TFTHEIGHT;
+    dspi.height = TFTWIDTH;
+    break;
 
-        default:
-            return;
-    }
+  default:
+    return;
+  }
 
-    cmd_data_tx(CMD_MADCTL, &madctl_reg, sizeof(madctl_reg));
+  cmd_data_tx(CMD_MADCTL, &madctl_reg, sizeof(madctl_reg));
 }
 
 /**
@@ -415,15 +451,15 @@ void ili9341_rotation_set(uint8_t orientation)
  */
 void ili9341_display_inversion(uint8_t inversion)
 {
-    uint8_t data = 0;
+  uint8_t data = 0;
 
-    if(inversion)
-    {
-        cmd_data_tx(CMD_INVON, &data, sizeof(data));
-        return;
-    }
+  if (inversion)
+  {
+    cmd_data_tx(CMD_INVON, &data, sizeof(data));
+    return;
+  }
 
-    cmd_data_tx(CMD_INVOFF, &data, sizeof(data));
+  cmd_data_tx(CMD_INVOFF, &data, sizeof(data));
 }
 
 /**
@@ -432,13 +468,13 @@ void ili9341_display_inversion(uint8_t inversion)
  */
 void ili9341_enable(uint8_t enable)
 {
-    if(enable)
-    {
-        cmd_tx(CMD_DISPON);
-        return;
-    }
+  if (enable)
+  {
+    cmd_tx(CMD_DISPON);
+    return;
+  }
 
-    cmd_tx(CMD_DISPOFF);
+  cmd_tx(CMD_DISPOFF);
 }
 
 /**
@@ -449,18 +485,18 @@ void ili9341_enable(uint8_t enable)
  */
 static uint32_t column_set(uint8_t column)
 {
-    dspi.column = column;
+  dspi.column = column;
 
-    dspi.x_p = column * font->glyph->xAdvance;
+  dspi.x_p = column * font->glyph->xAdvance;
 
-    if(dspi.x_p >= dspi.width)
-    {
-        dspi.x_p = 0;
-        /* Page overflow */
-        return RC_BUFF_OVERFLOW;
-    }
+  if (dspi.x_p >= dspi.width)
+  {
+    dspi.x_p = 0;
+    /* Page overflow */
+    return RC_BUFF_OVERFLOW;
+  }
 
-    return RC_SUCC;
+  return RC_SUCC;
 }
 
 /**
@@ -471,16 +507,16 @@ static uint32_t column_set(uint8_t column)
  */
 static int32_t row_inc(void)
 {
-    dspi.y_p += font->yAdvance - Y_ADVANCE_OFFS;
+  dspi.y_p += font->yAdvance - Y_ADVANCE_OFFS;
 
-    if(dspi.y_p >= dspi.height)
-    {
-        dspi.y_p = font->yAdvance - Y_ADVANCE_OFFS;
-        /* Page overflow */
-        return RC_BUFF_OVERFLOW;
-    }
+  if (dspi.y_p >= dspi.height)
+  {
+    dspi.y_p = font->yAdvance - Y_ADVANCE_OFFS;
+    /* Page overflow */
+    return RC_BUFF_OVERFLOW;
+  }
 
-    return RC_SUCC;
+  return RC_SUCC;
 }
 
 /**
@@ -489,16 +525,16 @@ static int32_t row_inc(void)
  */
 static uint32_t row_set(uint8_t row)
 {
-    dspi.y_p = (font->yAdvance - Y_ADVANCE_OFFS) * (row + 1);
+  dspi.y_p = (font->yAdvance - Y_ADVANCE_OFFS) * (row + 1);
 
-    if(dspi.y_p >= dspi.height)
-    {
-        dspi.y_p = font->yAdvance - Y_ADVANCE_OFFS;
-        /* Page overflow */
-        return RC_BUFF_OVERFLOW;
-    }
+  if (dspi.y_p >= dspi.height)
+  {
+    dspi.y_p = font->yAdvance - Y_ADVANCE_OFFS;
+    /* Page overflow */
+    return RC_BUFF_OVERFLOW;
+  }
 
-    return RC_SUCC;
+  return RC_SUCC;
 }
 
 /**
@@ -509,17 +545,17 @@ static uint32_t row_set(uint8_t row)
  */
 uint32_t ili9341_text_pos_set(uint8_t column, uint8_t row)
 {
-    uint32_t rc;
+  uint32_t rc;
 
-    rc = column_set(column);
-    if (rc)
-    {
-        return rc;
-    }
-
-    rc = row_set(row);
-
+  rc = column_set(column);
+  if (rc)
+  {
     return rc;
+  }
+
+  rc = row_set(row);
+
+  return rc;
 }
 
 /**
@@ -533,70 +569,70 @@ uint32_t ili9341_text_pos_set(uint8_t column, uint8_t row)
  */
 void ili9341_char_put(char c, uint16_t color, uint16_t bg_color)
 {
-    GFXglyph *glyph;
-    int8_t xo, yo;
-    uint8_t xx, yy, bits, bit;
-    uint16_t b_off;
-    uint8_t idx = (uint8_t) c;
+  GFXglyph *glyph;
+  int8_t xo, yo;
+  uint8_t xx, yy, bits, bit;
+  uint16_t b_off;
+  uint8_t idx = (uint8_t)c;
 
-    /* Determinte character offset */
-    idx -= font->first;
+  /* Determinte character offset */
+  idx -= font->first;
 
-    /* Initialise helper */
-    glyph = &(font->glyph[idx]);
+  /* Initialise helper */
+  glyph = &(font->glyph[idx]);
 
-    /* Check bitmap size, skip if nothing has to be printed */
-    if((glyph->width > 0) && (glyph->height > 0))
+  /* Check bitmap size, skip if nothing has to be printed */
+  if ((glyph->width > 0) && (glyph->height > 0))
+  {
+    xo = glyph->xOffset;
+    yo = glyph->yOffset;
+    bits = 0;
+    bit = 0;
+
+    /* Check if char fits in current line, otherwise go to next row */
+    if ((dspi.x_p + xo + glyph->width) > dspi.width)
     {
-        xo = glyph->xOffset;
-        yo = glyph->yOffset;
-        bits = 0;
-        bit = 0;
-
-        /* Check if char fits in current line, otherwise go to next row */
-        if((dspi.x_p + xo + glyph->width) > dspi.width)
-        {
-            dspi.x_p = 0;
-            row_inc();
-        }
-
-        /* Catch bug where address windows first coordinate is lower than
-         * zero */
-        if((int32_t) dspi.x_p + xo < 0)
-        {
-            xo = 0;
-        }
-
-        rect_coords_set(dspi.x_p + xo, dspi.y_p + yo,
-            dspi.x_p + xo + glyph->width - 1,
-            dspi.y_p + yo + glyph->height - 1);
-
-        cmd_tx(CMD_RAMWR);
-
-        b_off = glyph->bitmapOffset;
-        for (yy = 0; yy < glyph->height; yy++)
-        {
-            for (xx = 0; xx < glyph->width; xx++)
-            {
-                if (!(bit++ & 0x07))
-                {
-                    bits = (font->bitmap[b_off++]);
-                }
-
-                if (bits & 0x80)
-                {
-                    data16_tx(&color, 1);
-                }
-                else
-                {
-                    data16_tx(&bg_color, 1);
-                }
-
-                bits <<= 1;
-            }
-        }
+      dspi.x_p = 0;
+      row_inc();
     }
-    dspi.x_p += glyph->xAdvance;
+
+    /* Catch bug where address windows first coordinate is lower than
+     * zero */
+    if ((int32_t)dspi.x_p + xo < 0)
+    {
+      xo = 0;
+    }
+
+    rect_coords_set(dspi.x_p + xo, dspi.y_p + yo,
+                    dspi.x_p + xo + glyph->width - 1,
+                    dspi.y_p + yo + glyph->height - 1);
+
+    cmd_tx(CMD_RAMWR);
+
+    b_off = glyph->bitmapOffset;
+    for (yy = 0; yy < glyph->height; yy++)
+    {
+      for (xx = 0; xx < glyph->width; xx++)
+      {
+        if (!(bit++ & 0x07))
+        {
+          bits = (font->bitmap[b_off++]);
+        }
+
+        if (bits & 0x80)
+        {
+          data16_tx(&color, 1);
+        }
+        else
+        {
+          data16_tx(&bg_color, 1);
+        }
+
+        bits <<= 1;
+      }
+    }
+  }
+  dspi.x_p += glyph->xAdvance;
 }
 
 /**
@@ -607,32 +643,32 @@ void ili9341_char_put(char c, uint16_t color, uint16_t bg_color)
  */
 void ili9341_char_print(char c, uint16_t color, uint16_t bg_color)
 {
-    /* Catch non-printable and special characters */
-    switch(c)
+  /* Catch non-printable and special characters */
+  switch (c)
+  {
+  case '\r':
+    /* Carriage return */
+    column_set(0);
+    break;
+  case '\n':
+    /* Line feed */
+    row_inc();
+    break;
+  default:
+    /* Determine if the char is printable with current font */
+    if (c >= font->first && c <= font->last)
     {
-        case '\r':
-            /* Carriage return */
-            column_set(0);
-            break;
-        case '\n':
-            /* Line feed */
-            row_inc();
-            break;
-        default:
-            /* Determine if the char is printable with current font */
-            if(c >= font->first && c <= font->last)
-            {
-                /* Check if cursor is too low */
-                if(dspi.y_p < (font->yAdvance) - Y_ADVANCE_OFFS)
-                {
-                    dspi.y_p = (font->yAdvance) - Y_ADVANCE_OFFS;
-                }
+      /* Check if cursor is too low */
+      if (dspi.y_p < (font->yAdvance) - Y_ADVANCE_OFFS)
+      {
+        dspi.y_p = (font->yAdvance) - Y_ADVANCE_OFFS;
+      }
 
-                ili9341_char_put(c, color, bg_color);
-            }
-
-            break;
+      ili9341_char_put(c, color, bg_color);
     }
+
+    break;
+  }
 }
 
 /**
@@ -643,11 +679,11 @@ void ili9341_char_print(char c, uint16_t color, uint16_t bg_color)
  */
 void ili9341_str_print(char *str, uint16_t color, uint16_t bg_color)
 {
-    while(*str)
-    {
-        ili9341_char_print(*str, color, bg_color);
-        str++;
-    }
+  while (*str)
+  {
+    ili9341_char_print(*str, color, bg_color);
+    str++;
+  }
 }
 
 /**
@@ -658,8 +694,8 @@ void ili9341_str_print(char *str, uint16_t color, uint16_t bg_color)
  */
 void ili9341_str_clear(uint16_t num_chars, uint16_t color)
 {
-    ili9341_rect_fill(dspi.x_p, dspi.y_p - dspi.font_height + Y_ADVANCE_OFFS,
-        dspi.font_width * num_chars, dspi.font_height, color);
+  ili9341_rect_fill(dspi.x_p, dspi.y_p - dspi.font_height + Y_ADVANCE_OFFS,
+                    dspi.font_width * num_chars, dspi.font_height, color);
 }
 
 /**
@@ -671,59 +707,58 @@ void ili9341_str_clear(uint16_t num_chars, uint16_t color)
  * @param color[in] Color @ref ILI9341_COLOR_x
  */
 void ili9341_line_draw(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
-    uint16_t color)
+                       uint16_t color)
 {
-    int16_t steep;
-    int16_t dx, dy;
-    int16_t err;
-    int16_t ystep;
+  int16_t steep;
+  int16_t dx, dy;
+  int16_t err;
+  int16_t ystep;
 
-    steep = abs(y1 - y0) > abs(x1 - x0);
+  steep = abs(y1 - y0) > abs(x1 - x0);
+  if (steep)
+  {
+    swap_vals_int16(x0, y0);
+    swap_vals_int16(x1, y1);
+  }
+
+  if (x0 > x1)
+  {
+    swap_vals_int16(x0, x1);
+    swap_vals_int16(y0, y1);
+  }
+
+  dx = x1 - x0;
+  dy = abs(y1 - y0);
+
+  err = dx / 2;
+
+  if (y0 < y1)
+  {
+    ystep = 1;
+  }
+  else
+  {
+    ystep = -1;
+  }
+
+  for (; x0 <= x1; x0++)
+  {
     if (steep)
     {
-        swap_vals_int16(x0, y0);
-        swap_vals_int16(x1, y1);
-    }
-
-
-    if (x0 > x1)
-    {
-        swap_vals_int16(x0, x1);
-        swap_vals_int16(y0, y1);
-    }
-
-    dx = x1 - x0;
-    dy = abs(y1 - y0);
-
-    err = dx / 2;
-
-    if (y0 < y1)
-    {
-        ystep = 1;
+      ili9341_pixel_set(y0, x0, color);
     }
     else
     {
-        ystep = -1;
+      ili9341_pixel_set(x0, y0, color);
     }
 
-    for (; x0 <= x1; x0++)
+    err -= dy;
+    if (err < 0)
     {
-        if (steep)
-        {
-            ili9341_pixel_set(y0, x0, color);
-        }
-        else
-        {
-            ili9341_pixel_set(x0, y0, color);
-        }
-
-        err -= dy;
-        if (err < 0)
-        {
-            y0 += ystep;
-            err += dx;
-        }
+      y0 += ystep;
+      err += dx;
     }
+  }
 }
 
 /**
@@ -731,12 +766,12 @@ void ili9341_line_draw(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
  */
 static void configure_std(void)
 {
-    cmd_table_do(tbl_reset_off);
-    cmd_table_do(tbl_init_values);
-    cmd_table_do(tbl_wake_on);
+  cmd_table_do(tbl_reset_off);
+  cmd_table_do(tbl_init_values);
+  cmd_table_do(tbl_wake_on);
 
-    /* Increment y pointer so first line gets printed correctly */
-    dspi.y_p = font->yAdvance - Y_ADVANCE_OFFS;
+  /* Increment y pointer so first line gets printed correctly */
+  dspi.y_p = font->yAdvance - Y_ADVANCE_OFFS;
 }
 
 /**
@@ -744,22 +779,22 @@ static void configure_std(void)
  */
 void ili9341_hw_reset(void)
 {
-    io_cs_set(IO_STATE_RELEASE);
-    io_rd_set(IO_RS_DATA);
-    io_wr_set(IO_STATE_RELEASE);
-    io_rst_set(IO_STATE_ACTIVATE);
+  io_cs_set(IO_STATE_RELEASE);
+  io_rd_set(IO_RS_DATA);
+  io_wr_set(IO_STATE_RELEASE);
+  io_rst_set(IO_STATE_ACTIVATE);
 
-    systick_delay_ms(1);
+  systick_delay_ms(1);
 
-    io_rst_set(IO_STATE_RELEASE);
+  io_rst_set(IO_STATE_RELEASE);
 
-    systick_delay_ms(2);
+  systick_delay_ms(2);
 
-    io_rst_set(IO_STATE_ACTIVATE);
+  io_rst_set(IO_STATE_ACTIVATE);
 
-    systick_delay_ms(2);
+  systick_delay_ms(2);
 
-    io_cs_set(IO_STATE_RELEASE);
+  io_cs_set(IO_STATE_RELEASE);
 }
 
 /**
@@ -769,42 +804,49 @@ void ili9341_hw_reset(void)
  */
 int32_t ili9341_init(uint8_t rotation)
 {
-    int rc;
+  int rc;
 
-    rc = font_set(&FreeMonoBold12pt7b);
-    if (rc)
-    {
-        return rc;
-    }
+  rc = font_set(&FreeMonoBold12pt7b);
+  if (rc)
+  {
+    return rc;
+  }
 
-    io_gpio_init();
-    ili9341_hw_reset();
-    configure_std();
-    systick_delay_ms(40);
+  io_gpio_init();
+  ili9341_hw_reset();
+  configure_std();
+  systick_delay_ms(40);
 
-    switch (rotation)
-    {
-        case ILI9341_ORIENTATION_0:
-            ili9341_rotation_set(ILI9341_ORIENTATION_0);
-            break;
+  switch (rotation)
+  {
+  case ILI9341_ORIENTATION_0:
+    ili9341_rotation_set(ILI9341_ORIENTATION_0);
+    break;
 
-        case ILI9341_ORIENTATION_90:
-            ili9341_rotation_set(ILI9341_ORIENTATION_90);
-            break;
+  case ILI9341_ORIENTATION_90:
+    ili9341_rotation_set(ILI9341_ORIENTATION_90);
+    break;
 
-        case ILI9341_ORIENTATION_180:
-            ili9341_rotation_set(ILI9341_ORIENTATION_180);
-            break;
+  case ILI9341_ORIENTATION_180:
+    ili9341_rotation_set(ILI9341_ORIENTATION_180);
+    break;
 
-        case ILI9341_ORIENTATION_270:
-            ili9341_rotation_set(ILI9341_ORIENTATION_270);
-            break;
+  case ILI9341_ORIENTATION_270:
+    ili9341_rotation_set(ILI9341_ORIENTATION_270);
+    break;
 
-        default:
-            break;
-    }
+  default:
+    break;
+  }
 
-    ili9341_rect_fill(0, 0, dspi.width, dspi.height, ILI9341_COLOR_BLACK);
+  ili9341_rect_fill(0, 0, dspi.width, dspi.height, ILI9341_COLOR_BLACK);
 
-    return RC_SUCC;
+  return RC_SUCC;
+}
+
+void ili9341_draw_bmp_h(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                        uint8_t *bmp_data, uint16_t color, uint16_t bgcolor)
+{
+  // TODO: Implement the picture display function
+  
 }
