@@ -6,6 +6,9 @@
 #include <utils.h>
 #include <systick.h>
 
+
+
+
 int8_t running = 1;
 int8_t on_off_flag = 1;
 int8_t direction_flag = 1;
@@ -17,6 +20,7 @@ int32_t init_mcp23017()
 
 int32_t write_mcp23017(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size)
 {
+ 
   return i2c_hw_tx_device(addr, reg, buf, buf_size);
 }
 
@@ -28,8 +32,9 @@ int32_t write_mcp23017(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size
 /// @return RC_SUCC if successful, RC_ERR otherwise
 int32_t turn_on_led(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size)
 {
-  write_mcp23017(addr, reg, buf, buf_size);
 
+  // nop_30();
+  write_mcp23017(addr, reg, buf, buf_size);
   return RC_SUCC;
 }
 
@@ -123,7 +128,7 @@ void EXTI0_1_IRQHandler(void)
 
 void _turn_off_leds()
 {
-
+  nop_30();
   uint8_t gpio = 0x00; // 0000 0100
   uint8_t gpio2 = 0x00;
   gpio ^= 0xff;
@@ -141,6 +146,7 @@ int32_t led_loop()
   // using for loop to turn on and off each led
   // TODO: use interrupt to turn on and off each led
   // TODO: use interrupt to reverse the direction of the led loop
+  
   if (on_off_flag)
   {
     LIGHT lights[] = {D3_D8, D2_D7, D1_D9, D1_D9, D4_D6, D5_D10, D2_D7, D4_D6, D5_D10};
@@ -166,7 +172,9 @@ int32_t led_loop()
     uint8_t config_iodir4[] = {cur_led};
 
     turn_on_led(MCP_IN_ADDR, cur_gpio, config_iodir4, ARRAY_SIZE(config_iodir4));
+    
     systick_delay_ms(50);
+
     _turn_off_leds();
 
     if(direction_flag)
@@ -181,11 +189,12 @@ int32_t led_loop()
     //   counter = 0;
     // }
 
-    systick_delay_ms(50);
+    // systick_delay_ms(50);
+    // nop_30();
 
     return RC_SUCC;
   }
-
+  
   return 0;
 }
 
