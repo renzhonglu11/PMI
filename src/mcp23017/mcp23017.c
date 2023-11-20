@@ -149,7 +149,7 @@ int32_t led_loop()
   
   if (on_off_flag)
   {
-    LIGHT lights[] = {D3_D8, D2_D7, D1_D9, D1_D9, D4_D6, D5_D10, D2_D7, D4_D6, D5_D10};
+    LIGHT lights[] = {D3_D8, D2_D7, D1_D6, D1_D6, D4_D9, D5_D10, D2_D7, D4_D9, D5_D10};
     int8_t len_lights = ARRAY_SIZE(lights);
 
     int cur_position = counter % len_lights;
@@ -228,8 +228,8 @@ uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
   // TODO: implement state machine handler
   
   // control led according to the given state machine
-  uint8_t led1 = D3_D8 | D4_D6;
-  uint8_t led2 = D1_D9 | D5_D10;
+  uint8_t led1 = O;
+  uint8_t led2 = O;
 
 
   led1 ^= 0xff;
@@ -250,20 +250,20 @@ uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
 
 const ampel_state_t state_table[9] = {
 
-    // AMPEL1 AMPEL2   Induktionsschleife ?
-    // |         |       |   Wartezeit in s
+    // main street side street   condition ?
+    // |         |       |   time to wait
     // |         |       |   |
-    // |         |       |   |   naechster Zustand     Name
+    // |         |       |   |   next state     Name
     //----------------------------------------------------------------------
-    {G, g, 1, 3, MS_Y},  // OSTWEST_GRUEN
-    {Y, g, 0, 1, MS_R1}, // OSTWEST_GELB
-    {R, R, 0, 2, SS_D},  // ALLE_ROT_1
-    {R, D, 0, 1, SS_G},  // ALLE_ROT_1,
-    {g, G, 0, 10, SS_Y}, // NORDSUED_ROTGELB
-    {R, Y, 0, 1, MS_R2}, // ALLE_ROT_2
-    {R, R, 0, 1, MS_D},
-    {D, R, 0, 1, TL_G},
-    {G, R, 0, 1, MS_G},
+    {G, g, 1, 3, MS_Y},  // MS_G
+    {Y, g, 0, 1, MS_R1}, // MS_Y
+    {R, R, 0, 2, SS_D},  // MS_R1
+    {R, D, 0, 1, SS_G},  // SS_D
+    {g, G, 0, 10, SS_Y}, // SS_G
+    {R, Y, 0, 1, MS_R2}, // SS_Y
+    {R, R, 0, 1, MS_D},  // MS_R2
+    {D, R, 0, 1, TL_G},  // MS_D
+    {G, R, 0, 1, MS_G},  // MS_G
 };
 
 

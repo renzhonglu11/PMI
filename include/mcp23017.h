@@ -13,28 +13,30 @@
 // the led of 0x04 is not used
 typedef enum
 {
-    D1_D9 = 0x01,
+    D1_D6 = 0x01,
     D2_D7 = 0x02,
     D3_D8 = 0x04,
-    D4_D6 = 0x08,
+    D4_D9 = 0x08,
     D5_D10 = 0x10,
 
 } LIGHT;
 
-// TODO: define FSM_table
 
+// light_state : corresponding to table 2 in project sheet
 typedef enum
 {
     O = 0,
-    R,
-    g,
-    Y,
-    r,
-    G,
-    n,
-    D,
+    R= D1_D6 | D4_D9,
+    g = D1_D6 | D5_D10,  
+    Y = D2_D7 | D4_D9,
+    r = 0 | D4_D9,
+    G = D3_D8 | D4_D9,
+    n = D5_D10 | 0,
+    D = D1_D6 | D2_D7 | D4_D9,
 } light_state;
 
+
+// states of the finite state machine
 typedef enum
 {
     MS_G = 0,
@@ -48,6 +50,8 @@ typedef enum
     TL_G,
 } fsm_state;
 
+
+// definition of columns of the fsm table
 typedef struct {
     uint8_t HS;
     uint8_t NS;
@@ -58,16 +62,13 @@ typedef struct {
 
 
 
-
+// structure of the fsm 
 typedef struct FSM_s
 {
     ampel_state_t* fsm_table;
     uint8_t cur_state;
 
 }FSM_t;
-
-
-
 
 
 

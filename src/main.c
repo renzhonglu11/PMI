@@ -58,7 +58,12 @@ int main(void)
     ili9341_draw_bmp_h(x1, y1, width, height, (uint8_t*)stop_51x56, ILI9341_COLOR_RED,  ILI9341_COLOR_BLACK);
     
 
+    // gpio = D4_D6;
+    // gpio ^= 0xff;
+    // uint8_t config_iodir4[] = {gpio};
 
+    // turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir4, ARRAY_SIZE(config_iodir4));
+    // turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir4, ARRAY_SIZE(config_iodir4));
     // state_machine();
 
 
