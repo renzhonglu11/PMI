@@ -223,12 +223,59 @@ int32_t initial_interrupt()
 }
 
 
-uint32_t FSM_EventHandle()
+uint32_t FSM_EventHandler()
 {
   // TODO: implement state machine handler
   
   // control led according to the given state machine
   
   
+  return RC_SUCC;
+}
+
+
+
+
+
+const ampel_state_t state_table[9] = {
+
+    // AMPEL1 AMPEL2   Induktionsschleife ?
+    // |         |       |   Wartezeit in s
+    // |         |       |   |
+    // |         |       |   |   naechster Zustand     Name
+    //----------------------------------------------------------------------
+    {G, g, 1, 3, MS_Y},  // OSTWEST_GRUEN
+    {Y, g, 0, 1, MS_R1}, // OSTWEST_GELB
+    {R, R, 0, 2, SS_D},  // ALLE_ROT_1
+    {R, D, 0, 1, SS_G},  // ALLE_ROT_1,
+    {g, G, 0, 10, SS_Y}, // NORDSUED_ROTGELB
+    {R, Y, 0, 1, MS_R2}, // ALLE_ROT_2
+    {R, R, 0, 1, MS_D},
+    {D, R, 0, 1, TL_G},
+    {G, R, 0, 1, MS_G},
+};
+
+
+uint32_t state_machine()
+{
+  // 1. get the current state from state machine
+  // 2.1. when get back to initial state, hold
+  // 2.2. otherwise go to next state and hold for certain time according to the state machine
+
+  FSM_t fsm;
+  // initiailize fsm
+  fsm.cur_state = MS_G;
+  fsm.fsm_table = state_table; // array
+
+
+  
+
+
+  FSM_EventHandler();
+
+  // set_led()
+
+  // delay(t)
+
   return RC_SUCC;
 }

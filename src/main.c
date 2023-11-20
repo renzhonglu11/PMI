@@ -8,13 +8,14 @@
 #include <ili9341.h>
 #include <bmp_go_49x56.h>
 #include <bmp_stop_51x56.h>
+#include <string.h>
 
 int main(void)
 {
   /* Call your initialisations here */
   clocks_init_pmi();
   uart_init_nucusb(115200);
-  int32_t init_mcp = init_mcp23017();
+  init_mcp23017();
   ili9341_init(ILI9341_ORIENTATION_0);
   ili9341_enable(1);
 
@@ -33,8 +34,8 @@ int main(void)
   config_button();
   config_gpio(TRUE, 'A');
   config_gpio(TRUE, 'B');
-  int32_t b = turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
-  int32_t a = turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
+  turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
+  turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
   
   // draw pciture to led
   int8_t x0 = 20;
@@ -58,6 +59,9 @@ int main(void)
     
 
 
+    // state_machine();
+
+
     // TODO: try to implement aufgabe 2c
     // e.g. state_machine();
     // 1. initial state of the state machine
@@ -65,7 +69,8 @@ int main(void)
     // 3. use state machine to control the led
     //  3.1. implement a function that can accept state machine as paramter to control led
 
-    // state_machine():
+    state_machine();
+
     // 1. get the current state from state machine
     // 2.1. when get back to initial state, hold
     // 2.2. otherwise go to next state and hold for certain time according to the state machine

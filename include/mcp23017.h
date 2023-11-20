@@ -57,25 +57,20 @@ typedef struct {
 } ampel_state_t;
 
 
-const ampel_state_t state_table[8] = {
 
-    // AMPEL1 AMPEL2   Induktionsschleife ?
-    // |         |       |   Wartezeit in s
-    // |         |       |   |
-    // |         |       |   |   naechster Zustand     Name
-    //----------------------------------------------------------------------
-    {G, g, 1, 3, MS_Y},  // OSTWEST_GRUEN
-    {Y, g, 0, 1, MS_R1}, // OSTWEST_GELB
-    {R, R, 0, 2, SS_D},  // ALLE_ROT_1
-    {R, D, 0, 1, SS_G},  // ALLE_ROT_1,
-    {g, G, 0, 10, SS_Y}, // NORDSUED_ROTGELB
-    {R, Y, 0, 1, MS_R2}, // ALLE_ROT_2
-    {R, R, 0, 1, MS_D},
-    {D, R, 0, 1, TL_G},
-    {G, R, 0, 1, MS_G},
-}
 
-// TODO: define state machine
+typedef struct FSM_s
+{
+    ampel_state_t* fsm_table;
+    uint8_t cur_state;
+
+}FSM_t;
+
+
+
+
+
+
 
 int32_t
 config_gpio(enum PMI_BOOL_E value, char gpio);
@@ -86,5 +81,6 @@ int32_t init_mcp23017();
 int32_t write_mcp23017(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size);
 int32_t turn_on_led(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size);
 int32_t led_loop();
+uint32_t state_machine();
 
 #endif /* MCP23017_H */
