@@ -23,6 +23,31 @@ typedef enum
 
 // TODO: define FSM_table
 
+typedef enum
+{
+    O, R, g, Y, r, G, n, D,
+    
+    
+}LIGHT_STATE;
+// const ampel_state_t state_table[8] = {
+ 
+
+
+// AMPEL1 AMPEL2   Induktionsschleife ? 
+// |         |       |   Wartezeit in s
+// |         |       |   |
+// |         |       |   |   naechster Zustand     Name
+//----------------------------------------------------------------------
+{ROT     , GRUEN   , 1, 10,  OSTWEST_GELB},        // OSTWEST_GRUEN
+{ROT     , GELB    , 0,  1,  ALLE_ROT_1},          // OSTWEST_GELB
+{ROT     , ROT     , 0,  3,  NORDSUED_ROTGELB},    // ALLE_ROT_1
+{ROTGELB , ROT     , 0,  1,  NORDSUED_GRUEN},      // NORDSUED_ROTGELB
+{GRUEN   , ROT     , 0, 10,  NORDSUED_GELB},       // NORDSUED_GRUEN
+{GELB    , ROT     , 0,  1,  ALLE_ROT_2},          // NORDSUED_GELB
+{ROT     , ROT     , 0,  3,  OSTWEST_ROTGELB},     // ALLE_ROT_2
+{ROT     , ROTGELB , 0,  1,  OSTWEST_GRUEN}};      // OSTWEST_ROTGELB
+
+
 // TODO: define state machine
 
 
