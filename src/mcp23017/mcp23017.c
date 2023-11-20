@@ -223,13 +223,24 @@ int32_t initial_interrupt()
 }
 
 
-uint32_t FSM_EventHandler()
+uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
 {
   // TODO: implement state machine handler
   
   // control led according to the given state machine
-  
-  
+  uint8_t led1 = D3_D8 | D4_D6;
+  uint8_t led2 = D1_D9 | D5_D10;
+
+
+  led1 ^= 0xff;
+  led2 ^= 0xff;
+  uint8_t config_iodir1[] = {led1};
+  uint8_t config_iodir2[] = {led2};
+
+
+  turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir1, ARRAY_SIZE(config_iodir1));
+  turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
+
   return RC_SUCC;
 }
 
@@ -271,7 +282,8 @@ uint32_t state_machine()
   
 
 
-  FSM_EventHandler();
+  FSM_EventHandler(&fsm,fsm.cur_state);
+
 
   // set_led()
 
