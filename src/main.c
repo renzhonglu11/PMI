@@ -56,5 +56,21 @@ int main(void)
     ili9341_draw_bmp_h(x0, y0, width, height, (uint8_t*)go_49x56,  ILI9341_COLOR_GREEN,  ILI9341_COLOR_BLACK);
     ili9341_draw_bmp_h(x1, y1, width, height, (uint8_t*)stop_51x56, ILI9341_COLOR_RED,  ILI9341_COLOR_BLACK);
     
+
+
+    // TODO: try to implement aufgabe 2c
+    // e.g. state_machine();
+    // 1. initial state of the state machine
+    // 2. use interrupt to starte the state machine
+    // 3. use state machine to control the led
+    //  3.1. implement a function that can accept state machine as paramter to control led
+
+    // state_machine():
+    // 1. get the current state from state machine
+    // 2.1. when get back to initial state, hold
+    // 2.2. otherwise go to next state and hold for certain time according to the state machine
+     
+
+
   }
 }

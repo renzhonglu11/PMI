@@ -221,3 +221,14 @@ int32_t initial_interrupt()
 
   return RC_SUCC;
 }
+
+
+uint32_t FSM_EventHandle()
+{
+  // TODO: implement state machine handler
+  
+  // control led according to the given state machine
+  
+  
+  return RC_SUCC;
+}

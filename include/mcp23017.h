@@ -21,6 +21,10 @@ typedef enum
     
 }LIGHT;
 
+// TODO: define FSM_table
+
+// TODO: define state machine
+
 
 
 int32_t config_gpio(enum PMI_BOOL_E value, char gpio);
