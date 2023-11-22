@@ -5,15 +5,16 @@
 #include <ctype.h>
 #include <utils.h>
 #include <systick.h>
-
-
+#include <bmp_go_49x56.h>
+#include <bmp_stop_51x56.h>
+#include <ili9341.h>
 
 
 int8_t running = 1;
 int8_t on_off_flag = 1;
 int8_t direction_flag = 1;
-uint8_t state_fsm = 0;
-
+uint8_t start_fsm = 0;
+int8_t interrupt_lock = 0; // easy lock. No multi threads.
 
 int32_t init_mcp23017()
 {
@@ -95,11 +96,15 @@ void EXTI2_3_IRQHandler()
   // PB2 for SW1
   // uint8_t gpio = 0x00;
 
-  if (EXTI->PR & EXTI_PR_PIF2) // pending bit of EXTI line 2 is set
+  if (EXTI->PR & EXTI_PR_PIF2 ) // pending bit of EXTI line 2 is set
   {
 
     // on_off_flag ^= 1;  // exercise 1, turn on leds
-    state_fsm ^= 1;      //  start fsm
+    if(!interrupt_lock)
+    {
+    start_fsm ^= 1;      //  start fsm
+
+    }
 
     EXTI->PR = EXTI_PR_PIF2; // write one to corresponding pending bit to clear pending bit
   }
@@ -112,7 +117,11 @@ void EXTI0_1_IRQHandler(void)
   if(EXTI->PR & EXTI_PR_PIF1)
   {
     // direction_flag ^= 1;  // exercise 1, change the direction of led loop
+    if(!interrupt_lock)
+    {
+    start_fsm ^= 1;      //  start fsm
 
+    }
 
     EXTI->PR = EXTI_PR_PIF1;
   }
@@ -234,6 +243,27 @@ uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
   turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir1, ARRAY_SIZE(config_iodir1));
   turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
 
+
+  // draw pciture to led
+  int8_t x0 = 20;
+  int8_t y0 = 20;
+  int8_t width = 49;
+  int8_t height = 56;
+  int8_t x1 = 20;
+  int8_t y1 = (20+56+20);
+  if(fsm_t->fsm_table[event].HS == g)
+  { 
+    ili9341_draw_bmp_h(x1, y1, width, height, (uint8_t*)stop_51x56,  ILI9341_COLOR_BLACK,  ILI9341_COLOR_BLACK);
+    ili9341_draw_bmp_h(x0, y0, width, height, (uint8_t*)go_49x56,  ILI9341_COLOR_GREEN,  ILI9341_COLOR_BLACK);
+
+  }else if (fsm_t->fsm_table[event].NS != O || fsm_t->fsm_table[event].NS != n || fsm_t->fsm_table[event].NS != g)
+  {
+    ili9341_draw_bmp_h(x0, y0, width, height, (uint8_t*)go_49x56,  ILI9341_COLOR_BLACK,  ILI9341_COLOR_BLACK);
+    ili9341_draw_bmp_h(x1, y1, width, height, (uint8_t*)stop_51x56, ILI9341_COLOR_RED,  ILI9341_COLOR_BLACK);
+    
+  }
+  
+
   return RC_SUCC;
 }
 
@@ -280,9 +310,15 @@ uint32_t state_machine()
 
 
   // condition == 1 means back to initial state and hold
-  if(!state_fsm && cur_row.condition)
+  if(!start_fsm && cur_row.condition)
   {
+    
     return RC_SUCC;
+  }
+
+  if(cur_row.condition){
+    start_fsm ^=1; // set back to initial state
+    interrupt_lock ^=1;
   }
 
 
@@ -292,5 +328,10 @@ uint32_t state_machine()
 
   fsm.cur_state = next_state;    // go to the next state
 
+  if(fsm.fsm_table[fsm.cur_state].condition==1)
+  {
+    
+    interrupt_lock ^=1;
+  }
   return RC_SUCC;
 }
