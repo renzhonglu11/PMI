@@ -12,6 +12,8 @@
 int8_t running = 1;
 int8_t on_off_flag = 1;
 int8_t direction_flag = 1;
+uint8_t state_fsm = 0;
+
 
 int32_t init_mcp23017()
 {
@@ -95,21 +97,10 @@ void EXTI2_3_IRQHandler()
 
   if (EXTI->PR & EXTI_PR_PIF2) // pending bit of EXTI line 2 is set
   {
-    // systick_delay_ms(40);
 
-    // toggle_test();
+    // on_off_flag ^= 1;  // exercise 1, turn on leds
+    state_fsm ^= 1;      //  start fsm
 
-    // if(!running)
-    // {
-    //   gpio = 0x04;
-
-    // }
-    on_off_flag ^= 1;
-
-    // gpio ^= 0xff;
-
-    // uint8_t config_iodir3[] = {gpio};
-    // turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
     EXTI->PR = EXTI_PR_PIF2; // write one to corresponding pending bit to clear pending bit
   }
 }
@@ -120,9 +111,11 @@ void EXTI0_1_IRQHandler(void)
   // TODO: implment interrupt handler for SW2
   if(EXTI->PR & EXTI_PR_PIF1)
   {
-    direction_flag ^= 1;
+    // direction_flag ^= 1;  // exercise 1, change the direction of led loop
+
+
+    EXTI->PR = EXTI_PR_PIF1;
   }
-  EXTI->PR = EXTI_PR_PIF1;
 
 }
 
@@ -153,7 +146,7 @@ int32_t led_loop()
     int8_t len_lights = ARRAY_SIZE(lights);
 
     int cur_position = counter % len_lights;
-    // int cur_position = counter;
+
 
     int8_t cur_led = lights[cur_position];
 
@@ -228,8 +221,8 @@ uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
   // TODO: implement state machine handler
   
   // control led according to the given state machine
-  uint8_t led1 = O;
-  uint8_t led2 = O;
+  uint8_t led1 = fsm_t->fsm_table[event].HS;
+  uint8_t led2 = fsm_t->fsm_table[event].NS;
 
 
   led1 ^= 0xff;
@@ -243,8 +236,6 @@ uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
 
   return RC_SUCC;
 }
-
-
 
 
 
@@ -267,27 +258,39 @@ const ampel_state_t state_table[9] = {
 };
 
 
+
+
+FSM_t fsm = {
+  .cur_state = MS_G,
+  .fsm_table = state_table,
+};
+
+  // // initiailize fsm
 uint32_t state_machine()
-{
+{ 
+  // current implementation. Not sure there is better way to refactor the codes ！！！
   // 1. get the current state from state machine
   // 2.1. when get back to initial state, hold
   // 2.2. otherwise go to next state and hold for certain time according to the state machine
 
-  FSM_t fsm;
-  // initiailize fsm
-  fsm.cur_state = MS_G;
-  fsm.fsm_table = state_table; // array
+
+  // TODO： implement interrupt to start the state machine
+  ampel_state_t cur_row = fsm.fsm_table[fsm.cur_state];
+  FSM_EventHandler(&fsm , fsm.cur_state);
 
 
-  
+  // condition == 1 means back to initial state and hold
+  if(!state_fsm && cur_row.condition)
+  {
+    return RC_SUCC;
+  }
 
 
-  FSM_EventHandler(&fsm,fsm.cur_state);
+  uint8_t next_state = fsm.fsm_table[fsm.cur_state].next_state;
 
+  systick_delay_ms(cur_row.time2wait * 1000);
 
-  // set_led()
-
-  // delay(t)
+  fsm.cur_state = next_state;    // go to the next state
 
   return RC_SUCC;
 }

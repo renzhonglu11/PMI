@@ -10,10 +10,14 @@
 #include <bmp_stop_51x56.h>
 #include <string.h>
 
+
+
+
 int main(void)
 {
   /* Call your initialisations here */
   clocks_init_pmi();
+
   uart_init_nucusb(115200);
   init_mcp23017();
   ili9341_init(ILI9341_ORIENTATION_0);
@@ -45,8 +49,6 @@ int main(void)
   int8_t x1 = 20;
   int8_t y1 = (20+56+20);
 
-
-  
 
 
   while (1)
