@@ -317,8 +317,8 @@ uint32_t state_machine()
   }
 
   if(cur_row.condition){
-    start_fsm ^=1; // set back to initial state
-    interrupt_lock ^=1;
+    start_fsm ^=1;         // set back to initial state
+    interrupt_lock ^=1;    // set lock
   }
 
 
@@ -331,7 +331,7 @@ uint32_t state_machine()
   if(fsm.fsm_table[fsm.cur_state].condition==1)
   {
     
-    interrupt_lock ^=1;
+    interrupt_lock ^=1; // reset lock
   }
   return RC_SUCC;
 }
