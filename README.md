@@ -20,5 +20,5 @@ FSM table can be found in `mcp23017.c`.
 - [x] LED
 - [x] loop LED
 - [x] traffic light
-- [ ] led display for traffic light
+- [x] led display for traffic light
 - [ ] connect two I2C boards (if time allows)
