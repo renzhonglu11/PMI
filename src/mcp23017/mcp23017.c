@@ -306,6 +306,7 @@ uint32_t state_machine()
 
   // TODO： implement interrupt to start the state machine
   ampel_state_t cur_row = fsm.fsm_table[fsm.cur_state];
+  
   FSM_EventHandler(&fsm , fsm.cur_state);
 
 

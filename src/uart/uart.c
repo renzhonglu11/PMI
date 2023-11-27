@@ -80,3 +80,20 @@ char uart_rx_char(void)
     /* Read character */
     return (char) USART2->RDR;
 }
+
+void USART2_IRQHandler(void)
+{
+    
+}
+
+
+int32_t init_uart_interrupt()
+{
+    USART2->CR1 |=  USART_CR1_RXNEIE;  // enable intterupt
+
+    
+    NVIC_EnableIRQ(USART2_IRQn);
+    NVIC_SetPriority(USART2_IRQn,2);
+
+
+}
