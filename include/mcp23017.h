@@ -83,5 +83,7 @@ int32_t write_mcp23017(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size
 int32_t turn_on_led(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t buf_size);
 int32_t led_loop();
 uint32_t state_machine();
+void _turn_off_leds();
+int32_t uart_timeout_leds();
 
 #endif /* MCP23017_H */

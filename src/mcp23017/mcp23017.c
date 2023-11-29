@@ -8,13 +8,16 @@
 #include <bmp_go_49x56.h>
 #include <bmp_stop_51x56.h>
 #include <ili9341.h>
+#include <uart_irq.h>
 
 
-int8_t running = 1;
-int8_t on_off_flag = 1;
-int8_t direction_flag = 1;
-uint8_t start_fsm = 0;
-int8_t interrupt_lock = 0; // easy lock. No multi threads.
+volatile int8_t on_off_flag = 1;
+volatile int8_t direction_flag = 1;
+volatile uint8_t start_fsm = 0;
+volatile int8_t interrupt_lock = 0; // easy lock. No multi threads.
+
+
+
 
 int32_t init_mcp23017()
 {
@@ -70,6 +73,10 @@ int32_t config_gpio(enum PMI_BOOL_E value, char gpio)
   return write_mcp23017(MCP_IN_ADDR, iodir, config_iodir, sizeof(config_iodir) / sizeof(config_iodir[0]));
 }
 
+
+/// @brief configure the button
+/// @param  
+/// @return 
 int32_t config_button(void)
 {
   //  clock is already enable in gpio_init()
@@ -86,10 +93,7 @@ int32_t config_button(void)
   return RC_SUCC;
 }
 
-void toggle_test()
-{
-  running ^= 1;
-}
+
 
 void EXTI2_3_IRQHandler()
 {
@@ -110,6 +114,8 @@ void EXTI2_3_IRQHandler()
   }
 }
 
+
+
 void EXTI0_1_IRQHandler(void)
 {
   // PB1 for SW2
@@ -128,6 +134,7 @@ void EXTI0_1_IRQHandler(void)
 
 }
 
+/// @brief turn off all the leds
 void _turn_off_leds()
 {
   nop_30();
@@ -142,7 +149,9 @@ void _turn_off_leds()
 }
 
 int32_t counter = 0;
-
+uint32_t cur_position = 0;
+/// @brief start led loop
+/// @return 
 int32_t led_loop()
 {
   // using for loop to turn on and off each led
@@ -154,7 +163,16 @@ int32_t led_loop()
     LIGHT lights[] = {D3_D8, D2_D7, D1_D6, D1_D6, D4_D9, D5_D10, D2_D7, D4_D9, D5_D10};
     int8_t len_lights = ARRAY_SIZE(lights);
 
-    int cur_position = counter % len_lights;
+    // solve the module issue in C
+    if(counter>0)
+    {
+      cur_position = counter % len_lights;
+    }else {
+        // Adjust for negative counter values
+        cur_position = (counter% len_lights + len_lights) % len_lights;
+    }
+
+    // cur_position = counter % len_lights;
 
 
     int8_t cur_led = lights[cur_position];
@@ -174,8 +192,9 @@ int32_t led_loop()
     uint8_t config_iodir4[] = {cur_led};
 
     turn_on_led(MCP_IN_ADDR, cur_gpio, config_iodir4, ARRAY_SIZE(config_iodir4));
-    
-    systick_delay_ms(50);
+    nop_30();
+
+    systick_delay_ms(60);
 
     _turn_off_leds();
 
@@ -185,14 +204,15 @@ int32_t led_loop()
     }else{
       counter--;
     }
+    
 
     // if(counter>len_lights-1)
     // {
     //   counter = 0;
     // }
 
-    // systick_delay_ms(50);
-    // nop_30();
+
+
 
     return RC_SUCC;
   }
@@ -200,6 +220,9 @@ int32_t led_loop()
   return 0;
 }
 
+
+/// @brief initialise the interrupt of buttons
+/// @return 
 int32_t initial_interrupt()
 {
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN; // enables the clock for the System Configuration
@@ -224,7 +247,10 @@ int32_t initial_interrupt()
   return RC_SUCC;
 }
 
-
+/// @brief handling the state of fsm
+/// @param fsm_t fsm strusture
+/// @param event corresponding fsm event
+/// @return 
 uint32_t FSM_EventHandler(FSM_t* fsm_t,int8_t event)
 {
   // TODO: implement state machine handler
@@ -289,13 +315,14 @@ const ampel_state_t state_table[9] = {
 
 
 
-
+// initilise the fsm stucture
 FSM_t fsm = {
   .cur_state = MS_G,
   .fsm_table = state_table,
 };
 
-  // // initiailize fsm
+/// @brief start fsm
+/// @return 
 uint32_t state_machine()
 { 
   // current implementation. Not sure there is better way to refactor the codes ！！！
@@ -304,7 +331,6 @@ uint32_t state_machine()
   // 2.2. otherwise go to next state and hold for certain time according to the state machine
 
 
-  // TODO： implement interrupt to start the state machine
   ampel_state_t cur_row = fsm.fsm_table[fsm.cur_state];
   
   FSM_EventHandler(&fsm , fsm.cur_state);
@@ -335,4 +361,34 @@ uint32_t state_machine()
     interrupt_lock ^=1; // reset lock
   }
   return RC_SUCC;
+}
+
+
+/// @brief leds blink when uart is timeout
+/// @return 
+int32_t uart_timeout_leds()
+{ 
+
+      systick_delay_ms(300);
+      uint8_t led2 = D2_D7;
+      led2 ^= 0xff;
+      uint8_t config_iodir2[] = {led2};
+      turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir2, ARRAY_SIZE(config_iodir2));
+
+      systick_delay_ms(300);
+      
+      uint8_t gpio = 0x00; // 0000 0100
+      gpio ^= 0xff;
+      uint8_t config_iodir3[] = {gpio};
+      int32_t a = turn_on_led(MCP_IN_ADDR, MCP_GPIOB_ADDR, config_iodir3, ARRAY_SIZE(config_iodir3));
+
+
+
+
+      uint8_t led1 = D3_D8;
+      led1 ^= 0xff;
+      uint8_t config_iodir1[] = {led1};
+      turn_on_led(MCP_IN_ADDR, MCP_GPIOA_ADDR, config_iodir1, ARRAY_SIZE(config_iodir1));
+
+
 }
