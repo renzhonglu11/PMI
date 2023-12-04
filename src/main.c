@@ -1,12 +1,36 @@
 #include <uart.h>
 #include <clocks.h>
 #include <stm32l0xx.h>
+#include <mpi.h>
+#include <adxl345.h>
+
 
 int main(void)
 {
     /* Call your initialisations here */
     clocks_init_pmi();
-    uart_init_nucusb(115200);
+    // uart_init_nucusb(115200);
+
+    spi_init_adxl345();
+
+
+    
+    char uart_buf[] = "SPI Test\r\n";
+    uint8_t uart_buf_len;
+    char spi_buf[20];
+    uint8_t spi_buf_len;
+
+
+    uint8_t device_id_addr[] = {DEVID,DEVID,DEVID};
+    uint8_t device_id_addr_len;
+
+    uart_buf_len = elements_of(uart_buf);
+    spi_buf_len = elements_of(spi_buf);
+    device_id_addr_len = elements_of(device_id_addr);
+
+    
+
+
 
     while(1)
     {
@@ -14,5 +38,6 @@ int main(void)
 
       // print it out to UART 
 
+      spi_txrx(device_id_addr,device_id_addr_len);
     }
 }

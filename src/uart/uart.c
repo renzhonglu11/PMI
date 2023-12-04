@@ -80,3 +80,96 @@ char uart_rx_char(void)
     /* Read character */
     return (char) USART2->RDR;
 }
+
+
+void uart_tx_int(uint16_t num)
+{
+    // Convert the integer to its ASCII representation
+    char buffer[12]; // Assumes a 32-bit integer, so up to 10 digits plus a null terminator
+    sprintf(buffer, "%d", num);
+
+    // Transmit each character in the buffer
+    for (int i = 0; buffer[i] != '\0'; ++i)
+    {
+        uart_tx_char(buffer[i]);
+    }
+}
+
+
+void uart_tx_str(char *buf)
+{
+    // int8_t i=0;
+    // const char text[] = "Hello, World!\n";
+    // while(buf[i]!='\0')
+
+    while(*buf!='\0')
+    { 
+        //int8_t char_int = buf[i];
+        //uart_tx_char(char_int);
+        //i++;
+      
+        uart_tx_char(*buf);
+        buf++;
+    }
+
+}
+
+
+
+int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len)
+{
+
+    int i=0;
+ 
+
+    while(i<size-2 )
+    {
+        
+      char tmp_char = uart_rx_char();
+
+        if(tmp_char == '\n')
+        {
+            break;
+        }
+
+        buf[i] = tmp_char;
+
+        i++;
+        *len += 1;
+    }
+    
+    buf[i] = '\0';
+  
+
+    return *len;
+}
+
+
+int32_t uart_rx_uint(uint16_t *val)
+{   
+
+    char input_txt;
+    uint8_t i = 0;
+    *val = 0;
+
+    while(1){
+      if(input_txt == '\n'){
+        break;
+      }
+
+      input_txt = uart_rx_char();
+        
+      uint16_t input_int = atoi(&input_txt);
+      for(int j = 0;j<i;j++)
+      {
+          input_int = input_int * 10;
+      }
+
+      *val = input_int + *val;
+      i++;
+    }
+
+
+    return *val;
+    
+}

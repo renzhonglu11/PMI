@@ -22,4 +22,10 @@ void uart_tx_char(char c);
  */
 char uart_rx_char(void);
 
+void uart_tx_str(char *buf);
+int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len);
+int32_t uart_rx_uint(uint16_t *val);
+void uart_tx_int(uint16_t num);
+
+
 #endif /* UART_H */
