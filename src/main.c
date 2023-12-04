@@ -10,6 +10,9 @@ int main(void)
 
     while(1)
     {
-      
+      // get the data from the sensor adxl345
+
+      // print it out to UART 
+
     }
 }
