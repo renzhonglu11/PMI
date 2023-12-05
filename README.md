@@ -11,5 +11,6 @@ Codes are not updated frequently in this branch!!!
 
 
 ## Reference
-[GPIO复用](https://www.guyuehome.com/38427)
-
+* [GPIO复用](https://www.guyuehome.com/38427)
+* [SPI协议](https://blog.csdn.net/qq_38410730/article/details/80318821)
+* 
