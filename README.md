@@ -8,3 +8,8 @@ Codes are not updated frequently in this branch!!!
 
 ## Projects
 * [Project 1](https://github.com/renzhonglu11/PMI/tree/proj_1) (working on)
+
+
+## Reference
+[GPIO复用](https://www.guyuehome.com/38427)
+
