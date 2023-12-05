@@ -1,8 +1,8 @@
 #include <uart.h>
 #include <clocks.h>
-#include <stm32l0xx.h>
 #include <mpi.h>
 #include <adxl345.h>
+#include <stdio.h>
 
 
 int main(void)
@@ -10,9 +10,9 @@ int main(void)
     /* Call your initialisations here */
     clocks_init_pmi();
     // uart_init_nucusb(115200);
-
-    spi_init_adxl345();
-
+    uart_init_nucusb(115200);
+ 
+    adxl345_init();
 
     
     char uart_buf[] = "SPI Test\r\n";
@@ -37,7 +37,7 @@ int main(void)
       // get the data from the sensor adxl345
 
       // print it out to UART 
+      _test_adxl345();
 
-      spi_txrx(device_id_addr,device_id_addr_len);
     }
 }

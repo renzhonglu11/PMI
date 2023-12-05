@@ -19,8 +19,8 @@ int32_t spi_init_adxl345 ( void )
 
     // Enable the SPI1 peripheral clock
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-   //  RCC->IOPENR |= RCC_IOPENR_GPIOAEN;     // Enable GPIOA clock
-   RCC->APB2ENR |= RCC_IOPENR_GPIOAEN; //enable GPIOA clk
+    //  RCC->IOPENR |= RCC_IOPENR_GPIOAEN;     // Enable GPIOA clock
+    RCC->IOPENR |= RCC_IOPENR_GPIOAEN; //enable GPIOA clk
 
 
     // 2. Configure GPIO pins for SPI functions
@@ -33,7 +33,10 @@ int32_t spi_init_adxl345 ( void )
     // Configure PA12 as GPIO output for CS
     GPIOA->MODER &= ~GPIO_MODER_MODE12;
     GPIOA->MODER |= GPIO_MODER_MODE12_0;   // Set to output mode 01 (first bit 1)
+    
 
+
+    SPI1->CR1 = 0;
     // 3. Configure and Initialize SPI
     SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI; // Master mode, software slave management 11  high: idle, even: data sampled at 2nd edge
     
@@ -42,6 +45,8 @@ int32_t spi_init_adxl345 ( void )
     SPI1->CR1 |= SPI_CR1_CPOL | SPI_CR1_CPHA; // Clock polarity and phase, change as needed 11
 
     SPI1->CR1 &= ~SPI_CR1_DFF;              // 8-bit data frame format
+    
+    SPI1->CR2 = 0;                          // No interrupts
     SPI1->CR1 |= SPI_CR1_SPE;              // Enable SPI
 
     return RC_SUCC;

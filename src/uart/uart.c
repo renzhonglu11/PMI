@@ -96,20 +96,20 @@ void uart_tx_int(uint16_t num)
 }
 
 
-void uart_tx_str(char *buf)
+void uart_tx_str(char *string)
 {
     // int8_t i=0;
     // const char text[] = "Hello, World!\n";
     // while(buf[i]!='\0')
 
-    while(*buf!='\0')
+    while(*string!='\0')
     { 
         //int8_t char_int = buf[i];
         //uart_tx_char(char_int);
         //i++;
       
-        uart_tx_char(*buf);
-        buf++;
+        uart_tx_char(*string);
+        string++;
     }
 
 }

@@ -4,11 +4,29 @@
 #include <pmi_stddefs.h>
 #include <stm32l0xx.h>
 
+#define WRITE_BIT 0x80
+#define MB_BIT 0x40
 
-// Registers' Address 
-#define DEVID (uint8_t)0x0
-#define BW_RATE (uint8_t)0x2C 
-#define POWER_CTL (uint8_t)0x2D   // power-saving feature control
+
+#define DEVID               0x00 // Device ID
+
+// Power
+#define POWER_CTL           0x2DU // Power-saving features control
+#define POWER_CTL_Wakeup    0x03U // Wakeup (0b00000011)   1 Hz
+#define POWER_CTL_Sleep     0x04U // Sleep (0b00000100)
+#define POWER_CTL_Measure   0x08U // Measure (0b00001000)
+
+// Data
+#define DATAX0 0x32 // X-Axis Data 0
+#define DATAX1 0x33 // X-Axis Data 1
+#define DATAY0 0x34 // Y-Axis Data 0
+#define DATAY1 0x35 // Y-Axis Data 1
+#define DATAZ0 0x36 // Z-Axis Data 0
+#define DATAZ1 0x37 // Z-Axis Data 1
+
+// FIFO
+#define FIFO_CTL 0x38 // FIFO control
+#define FIFO_CTL_MODE_Stream 0x80 // Stream mode (0b10000000)
 
 
 
@@ -18,8 +36,9 @@
 #define ADXLCS_GPIO_Port     GPIOA
 
 
+// functions
 
-
-
+int32_t adxl345_init(void);
+int32_t _test_adxl345(void);
 
 #endif /* ADXL345_H */
