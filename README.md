@@ -6,7 +6,7 @@
 
 
 ## ADXL345
-(some of the information is provided by Chatgpt, if it does not work, refer back to the datasheet)
+(if something does not work, refer back to the datasheet)
 ### Data Registers
 
 According to the ADXL345 datasheet, the data for each axis is stored in the following registers:
