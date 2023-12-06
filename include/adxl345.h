@@ -3,9 +3,14 @@
 
 #include <pmi_stddefs.h>
 #include <stm32l0xx.h>
+#include <stdio.h>
+#include <uart.h>
+#include <systick.h>
 
-#define WRITE_BIT 0x80
-#define MB_BIT 0x40
+
+
+#define WRITE_BIT 0x80   // 1000 0000
+#define MB_BIT 0x40      // 0100 0000
 
 
 #define DEVID               0x00 // Device ID

@@ -4,7 +4,13 @@ int32_t adxl345_init(void)
 {
   spi_init_adxl345();
 
-  // Make sure sensor is not in measurement mode
+  while(!_test_adxl345())
+  {
+    uart_tx_str("ADXL345 init fails!\n");
+    systick_delay_ms(1000);  // wait for 1 sec
+  }
+  
+  // sensor configuration
   uint8_t power_sleep_buf[] = {POWER_CTL, POWER_CTL_Sleep};
   spi_txrx(power_sleep_buf, elements_of(power_sleep_buf));
 
@@ -40,7 +46,7 @@ int32_t adxl345_read_xyz(float *x, float *y, float *z)
 int32_t _test_adxl345(void)
 {
 
-  uint8_t buf[] = {(DEVID | WRITE_BIT) & ~MB_BIT};
+  uint8_t buf[] = {(DEVID | WRITE_BIT) & ~MB_BIT};   
   char hexStr[10];
 
   spi_txrx(buf, 1);
