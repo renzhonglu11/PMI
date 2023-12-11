@@ -7,19 +7,16 @@
 #include <uart.h>
 #include <systick.h>
 
+#define WRITE_BIT 0x80 // 1000 0000
+#define MB_BIT 0x40    // 0100 0000
 
-
-#define WRITE_BIT 0x80   // 1000 0000
-#define MB_BIT 0x40      // 0100 0000
-
-
-#define DEVID               0x00 // Device ID
+#define DEVID 0x00 // Device ID
 
 // Power
-#define POWER_CTL           0x2DU // Power-saving features control
-#define POWER_CTL_Wakeup    0x03U // Wakeup (0b00000011)   1 Hz
-#define POWER_CTL_Sleep     0x04U // Sleep (0b00000100)
-#define POWER_CTL_Measure   0x08U // Measure (0b00001000)
+#define POWER_CTL 0x2DU         // Power-saving features control
+#define POWER_CTL_Wakeup 0x03U  // Wakeup (0b00000011)   1 Hz
+#define POWER_CTL_Sleep 0x04U   // Sleep (0b00000100)
+#define POWER_CTL_Measure 0x08U // Measure (0b00001000)
 
 // Data
 #define DATAX0 0x32 // X-Axis Data 0
@@ -30,20 +27,23 @@
 #define DATAZ1 0x37 // Z-Axis Data 1
 
 // FIFO
-#define FIFO_CTL 0x38 // FIFO control
+#define FIFO_CTL 0x38             // FIFO control
 #define FIFO_CTL_MODE_Stream 0x80 // Stream mode (0b10000000)
 
-
-
-
-
 // GPIO definition
-#define ADXLCS_GPIO_Port     GPIOA
+#define ADXLCS_GPIO_Port GPIOA
 
+struct AccelerometerData
+{
+    int16_t x;
+    int16_t y;
+    int16_t z;
+};
 
 // functions
 
 int32_t adxl345_init(void);
 int32_t _test_adxl345(void);
+struct AccelerometerData adxl345_get_data(void);
 
 #endif /* ADXL345_H */

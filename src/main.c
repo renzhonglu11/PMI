@@ -40,6 +40,7 @@ int main(void)
 
       // print it out to UART 
       _test_adxl345();
+      adxl345_get_data();
 
     }
 }
