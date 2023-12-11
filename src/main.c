@@ -12,6 +12,8 @@ int main(void)
     // uart_init_nucusb(115200);
     uart_init_nucusb(115200);
  
+    ili9341_init(ILI9341_ORIENTATION_90);  // initilize the LCD screen
+
     adxl345_init();
 
     

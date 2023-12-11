@@ -61,10 +61,9 @@ int32_t spi_init_adxl345 ( void )
    a byte from the buffer to the SPI1->DR register to transmit it.
    Receive: It waits for the receive buffer to be not empty (checked using SPI_SR_RXNE in the SPI1->SR register) 
    and then reads a byte from the SPI1->DR register. The received byte can be stored back in the buffer or processed as needed.
+
    */
 
-
-   
 
    // pull down CS line of the corresponding GPIO
    GPIOA->BSRR |= GPIO_BSRR_BR_12;   // resset PA12

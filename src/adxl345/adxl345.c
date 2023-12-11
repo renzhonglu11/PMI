@@ -4,12 +4,19 @@ int32_t adxl345_init(void)
 {
   spi_init_adxl345();
 
-  while(!_test_adxl345())
+  while(_test_adxl345())
   {
     uart_tx_str("ADXL345 init fails!\n");
     systick_delay_ms(1000);  // wait for 1 sec
   }
   
+  /*
+    send: (we dont care the read data here!!) 
+      1. send the address of the register to be read
+      2. send the data to be written
+  */
+
+
   // sensor configuration
   uint8_t power_sleep_buf[] = {POWER_CTL, POWER_CTL_Sleep};
   spi_txrx(power_sleep_buf, elements_of(power_sleep_buf));
@@ -60,4 +67,22 @@ int32_t _test_adxl345(void)
   uart_tx_char('\n');
 
   return RC_SUCC;
+}
+
+/// @brief get the datas from sensor
+/// @param x 
+/// @param y 
+/// @param z 
+/// @return RC_SUCC
+int32_t adxl345_get_data(float *x, float *y, float *z)
+{
+  // 1. read x, y, z from the corresponding resgister (multiple bytes will be read)
+  
+
+  // 2. convert the data to 16-bit signed integers
+
+
+
+  return RC_SUCC;
+  
 }
