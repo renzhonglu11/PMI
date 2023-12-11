@@ -19,16 +19,23 @@
 #define POWER_CTL_Measure 0x08U // Measure (0b00001000)
 
 // Data
+#define DATA_FORMAT 0x31  // data format
 #define DATAX0 0x32 // X-Axis Data 0
 #define DATAX1 0x33 // X-Axis Data 1
 #define DATAY0 0x34 // Y-Axis Data 0
 #define DATAY1 0x35 // Y-Axis Data 1
 #define DATAZ0 0x36 // Z-Axis Data 0
 #define DATAZ1 0x37 // Z-Axis Data 1
+#define OFSX   0x1E
+#define OFSY   0x1F
+#define OFSZ   0x20
+
 
 // FIFO
 #define FIFO_CTL 0x38             // FIFO control
 #define FIFO_CTL_MODE_Stream 0x80 // Stream mode (0b10000000)
+
+
 
 // GPIO definition
 #define ADXLCS_GPIO_Port GPIOA

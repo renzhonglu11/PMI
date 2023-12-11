@@ -28,6 +28,23 @@ int32_t adxl345_init(void)
   };
   spi_txrx(config_buf, elements_of(config_buf));
 
+  uint8_t config_offset_x[] = {
+      OFSX, 0x00 
+                                    
+  };
+  uint8_t config_offset_y[] = {
+    OFSY, 0x00 
+                                  
+};
+  uint8_t config_offset_z[] = {
+    OFSZ, 0x00 
+                                  
+  };
+
+  spi_txrx(config_offset_x,elements_of(config_offset_x));
+  spi_txrx(config_offset_y,elements_of(config_offset_y));
+  spi_txrx(config_offset_z,elements_of(config_offset_z));
+
   // Power on sensor and start measuring
   // Enable measurement mode last
   uint8_t power_measure_buf[] = {POWER_CTL, POWER_CTL_Measure};
@@ -80,13 +97,13 @@ struct AccelerometerData adxl345_get_data(void)
   // 1. read x, y, z from the corresponding resgister (multiple bytes will be read)
   struct AccelerometerData data;
 
-  int16_t data_buf[] = {(DATAX0 | WRITE_BIT | MB_BIT) , 0x00,0x00,0x00,0x00,0x00,0x00};
+  int8_t data_buf[] = {(DATAX0 | WRITE_BIT | MB_BIT) , 0x00,0x00,0x00,0x00,0x00};
   spi_txrx(data_buf,elements_of(data_buf));
 
 
-  data.x = data_buf[0] | data_buf[1]<<8;
-  data.y = data_buf[2] | data_buf[3]<<8;
-  data.z = data_buf[4] | data_buf[5]<<8;
+  data.x = (int16_t) ((data_buf[1]<<8)|data_buf[0]);
+  data.y = (int16_t)((data_buf[3]<<8)|data_buf[2] );
+  data.z = (int16_t)((data_buf[5]<<8)|data_buf[4]);
 
 
   

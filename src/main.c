@@ -39,8 +39,30 @@ int main(void)
       // get the data from the sensor adxl345
 
       // print it out to UART 
-      _test_adxl345();
-      adxl345_get_data();
+      // _test_adxl345();
+ 
+
+      struct AccelerometerData data =  adxl345_get_data();
+  
+
+
+      // sprintf(StrBuff,"X=%.3f    m/s2   Y=%.3f  m/s2   Z=%.3f  m/s2 \r\n",data.x*3.9/1000*9.8,data.y*3.9/1000*9.8,data.z*3.9/1000*9.8);
+      double my_num = data.x*3.9/1000*9.8;
+
+
+      // Convert the double to fixed-point representation (multiply by a factor, e.g., 1000)
+      int fixed_point = (int)(my_num * 1000);
+
+      // Transmit the fixed-point value through UART
+      char buffer[20];  // Adjust the size based on your needs
+      snprintf(buffer, sizeof(buffer), "%d.%03d", fixed_point / 1000, fixed_point < 0 ? -fixed_point % 1000 : fixed_point % 1000);
+
+   
+
+
+      uart_tx_str_signed(buffer);
+
+      uart_tx_char('\n');
 
     }
 }
