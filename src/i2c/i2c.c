@@ -8,11 +8,25 @@
 
 int32_t i2c_init()
 {
-  // enable clock
-
+  // enable clock of port B
+  RCC->IOPENR |= RCC_IOPENR_IOPBEN; 
   // PB8->SCL, PB9->SDA
+  SCL_INPUT;
+
+
+  
 
   // set SCL and SDA as idle high
+  SDA_HIGH;
+  SCL_HIGH;
+
+  if(IS_SDA_HIGH && IS_SCL_HIGH)
+  {
+    // SCL and SDA should be high at start condition
+    return RC_SUCC;
+  }
+
+  return RC_ERR;
 
 }
 

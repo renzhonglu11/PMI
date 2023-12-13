@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <pmi_string.h>
 #include <systick.h>
-
+#include <my_utils.h>
 
 int main(void)
 {
@@ -42,26 +42,28 @@ int main(void)
 
       // print it out to UART 
       // _test_adxl345();
-      float x =0.0;
-      float y =0.0;
-      float z =0.0;
+      // float x =0.0;
+      // float y =0.0;
+      // float z =0.0;
 
-      int32_t success_get_data =  adxl345_acc_data(&x,&y,&z);
+      // int32_t success_get_data =  adxl345_acc_data(&x,&y,&z);
   
 
 
       // sprintf(StrBuff,"X=%.3f    m/s2   Y=%.3f  m/s2   Z=%.3f  m/s2 \r\n",data.x*3.9/1000*9.8,data.y*3.9/1000*9.8,data.z*3.9/1000*9.8);
 
-      char buffer[20];
+      // char buffer[20];
 
 
-      float2str(buffer,elements_of(buffer),x,3);
+      // float2str(buffer,elements_of(buffer),x,3);
 
 
 
 
-      uart_tx_str(buffer);
-      uart_tx_char('\n');
+      // uart_tx_str(buffer);
+      // uart_tx_char('\n');
+
+      output_data();
       systick_delay_ms(100);
 
     }
