@@ -115,27 +115,6 @@ void uart_tx_str(char *string)
 }
 
 
-void uart_tx_str_signed(char *string)
-{
-    // int8_t i=0;
-    // const char text[] = "Hello, World!\n";
-    // while(buf[i]!='\0')
-    char *skipFirstChar = string + 1;
-
-
-    while(*skipFirstChar!='\0')
-    { 
-        //int8_t char_int = buf[i];
-        //uart_tx_char(char_int);
-        //i++;
-      
-        uart_tx_char(*skipFirstChar);
-        skipFirstChar++;
-    }
-
-}
-
-
 
 
 int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len)

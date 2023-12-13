@@ -3,6 +3,8 @@
 #include <mpi.h>
 #include <adxl345.h>
 #include <stdio.h>
+#include <pmi_string.h>
+#include <systick.h>
 
 
 int main(void)
@@ -40,29 +42,27 @@ int main(void)
 
       // print it out to UART 
       // _test_adxl345();
- 
+      float x =0.0;
+      float y =0.0;
+      float z =0.0;
 
-      struct AccelerometerData data =  adxl345_get_data();
+      int32_t success_get_data =  adxl345_acc_data(&x,&y,&z);
   
 
 
       // sprintf(StrBuff,"X=%.3f    m/s2   Y=%.3f  m/s2   Z=%.3f  m/s2 \r\n",data.x*3.9/1000*9.8,data.y*3.9/1000*9.8,data.z*3.9/1000*9.8);
-      double my_num = data.x*3.9/1000*9.8;
+
+      char buffer[20];
 
 
-      // Convert the double to fixed-point representation (multiply by a factor, e.g., 1000)
-      int fixed_point = (int)(my_num * 1000);
-
-      // Transmit the fixed-point value through UART
-      char buffer[20];  // Adjust the size based on your needs
-      snprintf(buffer, sizeof(buffer), "%d.%03d", fixed_point / 1000, fixed_point < 0 ? -fixed_point % 1000 : fixed_point % 1000);
-
-   
+      float2str(buffer,elements_of(buffer),x,3);
 
 
-      uart_tx_str_signed(buffer);
 
+
+      uart_tx_str(buffer);
       uart_tx_char('\n');
+      systick_delay_ms(100);
 
     }
 }

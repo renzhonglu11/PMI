@@ -26,6 +26,6 @@ void uart_tx_str(char *buf);
 int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len);
 int32_t uart_rx_uint(uint16_t *val);
 void uart_tx_int(uint16_t num);
-void uart_tx_str_signed(char *string);
+
 
 #endif /* UART_H */

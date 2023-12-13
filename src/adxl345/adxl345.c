@@ -92,10 +92,10 @@ int32_t _test_adxl345(void)
 /// @param z 
 /// @return RC_SUCC
 // int32_t adxl345_get_data(float *x, float *y, float *z)
-struct AccelerometerData adxl345_get_data(void)
+int32_t adxl345_acc_data(float *x, float *y, float *z)
 {
   // 1. read x, y, z from the corresponding resgister (multiple bytes will be read)
-  struct AccelerometerData data;
+  accelerometerData data;
 
   int8_t data_buf[] = {(DATAX0 | WRITE_BIT | MB_BIT) , 0x00,0x00,0x00,0x00,0x00};
   spi_txrx(data_buf,elements_of(data_buf));
@@ -109,9 +109,11 @@ struct AccelerometerData adxl345_get_data(void)
   
 
   // 2. convert the data to 16-bit signed integers
+  *x = data.x * 3.9 / 1000 * 9.8;
+  *y = data.y * 3.9 / 1000 * 9.8;
+  *z = data.z * 3.9 / 1000 * 9.8;
 
 
-
-  return data;
+  return RC_SUCC;
   
 }

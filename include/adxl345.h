@@ -40,17 +40,17 @@
 // GPIO definition
 #define ADXLCS_GPIO_Port GPIOA
 
-struct AccelerometerData
+typedef struct AccelerometerData
 {
     int16_t x;
     int16_t y;
     int16_t z;
-};
+}accelerometerData;
 
 // functions
 
 int32_t adxl345_init(void);
 int32_t _test_adxl345(void);
-struct AccelerometerData adxl345_get_data(void);
+int32_t adxl345_acc_data(float *x, float *y, float *z);
 
 #endif /* ADXL345_H */
