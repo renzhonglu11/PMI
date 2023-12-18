@@ -13,8 +13,11 @@
 /*configurations*/
 #define ConfigReg1 0x09
 
-#define StandbyConversion 0x00
+/*all the bits are already in the correct postion*/
+#define StandbyConversion    0x00
 #define ContinuousConversion 0x01
+#define Full_Scale_2G	     0x00		
+#define Full_Scale_8G		 0x10
 
 
 /*data*/
@@ -31,6 +34,7 @@
 int32_t qmc5883l_init(void);
 void qmc5883l_read_reg(uint8_t reg_address, uint8_t *data, uint8_t numBytes);
 void qmc5883l_write_reg(uint8_t reg, uint8_t data);
+void qmc5883l_get_raw_data(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z);
 
 
 

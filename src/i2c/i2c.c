@@ -1,21 +1,16 @@
 #include <i2c.h>
 #include <uart.h>
-/**
- * init i2c
- * i2c start state, i2c stop state, i2c write bits/bytes, i2c read bits bytes
- */
 
+/// @brief Initialize software-based I2C using open-drain and push-up
+/// @return RC_ERR
 int32_t i2c_init()
 {
   // enable clock of port B
   RCC->IOPENR |= RCC_IOPENR_IOPBEN;
   // PB8->SCL, PB9->SDA
-  // GPIOB->MODER &= ~(GPIO_MODER_MODE8);
-  // GPIOB->MODER |= GPIO_MODER_MODE8_0;
-  GPIOB->MODER &= ~(GPIO_MODER_MODE8 | GPIO_MODER_MODE9); // Clear mode bits for pins 6 and 7
+  GPIOB->MODER &= ~(GPIO_MODER_MODE8 | GPIO_MODER_MODE9); // Clear mode bits for pins 8 and 9
   GPIOB->MODER |= (GPIO_MODER_MODE8_0 | GPIO_MODER_MODE9_0); // Set pins as output
 
-  
 
   GPIOB->OTYPER |= (GPIO_OTYPER_OT_8 | GPIO_OTYPER_OT_9);    // Set pins as open-drain
   GPIOB->PUPDR |= (GPIO_PUPDR_PUPD8_0 | GPIO_PUPDR_PUPD9_0); // Enable pull-up
@@ -26,6 +21,8 @@ int32_t i2c_init()
   return RC_ERR;
 }
 
+/// @brief Start state of I2C
+/// @param  
 void I2C_start(void)
 {
   // HIGH to LOW transition of SDA while SCL is HIGH
@@ -39,6 +36,9 @@ void I2C_start(void)
   I2C_DELAY;
 }
 
+
+/// @brief Stop state of I2C
+/// @param  
 void I2C_stop(void)
 {
   // LOW to HIGH transition of SDA while SCL is HIGH
@@ -49,6 +49,8 @@ void I2C_stop(void)
   I2C_DELAY;
 }
 
+/// @brief Write a bit with I2C
+/// @param bit 
 void I2C_WriteBit(uint8_t bit)
 {
   if (bit)
@@ -65,6 +67,10 @@ void I2C_WriteBit(uint8_t bit)
   SCL_LOW();
   I2C_DELAY;
 }
+
+/// @brief Write a byte with I2C
+/// @param byte byte to be written to I2C
+/// @return ACK = 0 if slave replay or NACK = 1 if no reply
 uint8_t I2C_WriteByte(uint8_t byte)
 {
   
@@ -77,12 +83,15 @@ uint8_t I2C_WriteByte(uint8_t byte)
   return ack==0;
 }
 
+/// @brief Read a bit with I2C
+/// @param  
+/// @return Bit to be read
 uint8_t I2C_ReadBit(void)
 {
   uint8_t bit;
-  SDA_HIGH();   // master releases SDA
+  SDA_HIGH();   // master must first release SDA so that the slave can pull down the line
   I2C_DELAY;
-  SCL_HIGH();   // master release SCL
+  SCL_HIGH();   // master release SCL and is ready to read SDA
   I2C_DELAY;
   bit = SDA_READ();   // it makes sense here, it wont always 1 because slave may pull SDA low
   SCL_LOW();
@@ -90,6 +99,9 @@ uint8_t I2C_ReadBit(void)
   return bit;
 }
 
+/// @brief Read a byte with I2C
+/// @param ack Ack bit. 1: stop reading, 0: continue to read
+/// @return 
 uint8_t I2C_ReadByte(uint8_t ack)
 {
   uint8_t byte = 0;
@@ -101,7 +113,9 @@ uint8_t I2C_ReadByte(uint8_t ack)
   return byte;
 }
 
-
+/// @brief Read Ack
+/// @param  
+/// @return ACK=0 or NACK=1
 uint8_t I2C_ReadAck(void) {
     uint8_t ack;
 
@@ -113,7 +127,7 @@ uint8_t I2C_ReadAck(void) {
     return ack == 0;  // An ACK is indicated by a low level on SDA
 }
 
-
+// This function is not used currently
 void i2c_write(int8_t address, uint8_t* buf, int16_t size){
 
   // send start condition
