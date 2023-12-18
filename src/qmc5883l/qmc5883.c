@@ -2,11 +2,17 @@
 
 void qmc5883l_write_reg(uint8_t reg, uint8_t data)
 {
-  uint8_t buf[2];
-  buf[0] = reg;
-  buf[1] = data;
+  // uint8_t buf[2];
+  // buf[0] = reg;
+  // buf[1] = data;
 
-  i2c_write(QMC5883L_ADDR, buf, 2);
+  // i2c_write(QMC5883L_ADDR, buf, 2);
+
+  I2C_start();
+  I2C_WriteByte(QMC5883L_ADDR << 1);
+  I2C_WriteByte(reg);
+  I2C_WriteByte(data);
+  I2C_stop();
 }
 
 void qmc5883l_read_reg(uint8_t reg_address, uint8_t *data, uint8_t numBytes)
@@ -47,6 +53,9 @@ int32_t qmc5883l_init(void)
   return RC_SUCC;
 }
 
+
+
+
 int32_t _qmc5883l_internal_test()
 {
   uint8_t data_buf[1];
@@ -61,3 +70,4 @@ int32_t _qmc5883l_internal_test()
 
   return RC_SUCC;
 }
+

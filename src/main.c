@@ -8,8 +8,7 @@
 #include <my_utils.h>
 #include <i2c.h>
 
-#define MODE_REGISTER 0x02 // Mode register address
-#define MODE_REGISTER_CONTINUOUS 0x00 // Continuous-Measurement Mode
+
 
 
 int main(void)
@@ -24,18 +23,8 @@ int main(void)
   adxl345_init();
   qmc5883l_init();
 
-  char uart_buf[] = "SPI Test\r\n";
-  uint8_t uart_buf_len;
-  char spi_buf[20];
-  uint8_t spi_buf_len;
 
-  uint8_t device_id_addr[] = {DEVID, DEVID, DEVID};
-  uint8_t device_id_addr_len;
-
-  uart_buf_len = elements_of(uart_buf);
-  spi_buf_len = elements_of(spi_buf);
-  device_id_addr_len = elements_of(device_id_addr);
-
+  qmc5883l_write_reg(ConfigReg1,0x12);  // set the mode to continuous mode
 
 
 
@@ -64,7 +53,16 @@ int main(void)
     // systick_delay_ms(100);
  
 
-    _qmc5883l_internal_test();  // testing I2C
+    // _qmc5883l_internal_test();  // testing I2C
+    uint8_t data_buf[1];
+    char hexStr[10];
+
+    
+    qmc5883l_read_reg(ConfigReg1,data_buf,elements_of(data_buf));
+    sprintf(hexStr, "0x%X", data_buf[0]);
+    uart_tx_str("configReg1: ");
+    uart_tx_str(hexStr);
+    uart_tx_char('\n');
 
     systick_delay_ms(1000);
 
