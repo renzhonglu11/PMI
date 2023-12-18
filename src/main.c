@@ -19,7 +19,7 @@ int main(void)
 
     output_data(); // output all the data from sensors
 
-    systick_delay_ms(1000);
+    systick_delay_ms(3000);
 
   }
 }

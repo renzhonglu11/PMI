@@ -40,3 +40,14 @@ Open-drain allows device on the bus to pull the line low to trainsmit a '0' and 
 ### Notes of I2C:
 
 **Simultaneous Actions**: If one device pulls the line low (to send a '0') while another device releases the line (either to send a '1' or to stop communicating), the action of pulling the line low will dominate. This is because the low state is an active state, where the line is physically connected to ground, whereas the high state is passive, relying only on the pull-up resistor.
+
+
+
+## TODO
+
+- [x] SPI
+- [x] software-based I2C
+- [ ] one-wire protocol
+- [ ] get correct and formated data from adxl345
+- [ ] get correct and formated data from qmc5883
+- [ ] get correct and formated data from ds18b20

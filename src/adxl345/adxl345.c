@@ -91,9 +91,11 @@ int32_t _test_adxl345(void)
 /// @param y 
 /// @param z 
 /// @return RC_SUCC
-// int32_t adxl345_get_data(float *x, float *y, float *z)
+
 int32_t adxl345_acc_data(float *x, float *y, float *z)
 {
+  // TODO: data are a little bit strange, it still need to be checked
+
   // 1. read x, y, z from the corresponding resgister (multiple bytes will be read)
   accelerometerData data;
 
@@ -102,7 +104,7 @@ int32_t adxl345_acc_data(float *x, float *y, float *z)
 
 
   data.x = (int16_t) ((data_buf[1]<<8)|data_buf[0]);
-  data.y = (int16_t)((data_buf[3]<<8)|data_buf[2] );
+  data.y = (int16_t)((data_buf[3]<<8)|data_buf[2]);
   data.z = (int16_t)((data_buf[5]<<8)|data_buf[4]);
 
 
