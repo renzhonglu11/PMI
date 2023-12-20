@@ -96,13 +96,16 @@ int32_t _qmc5883l_internal_test()
 /// @param mag_z z coordination
 void qmc5883l_get_raw_data(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z)
 {
-  int8_t data_buf[6];   // sign 8-bits integer: -32768 and 32767
+  uint8_t data_buf[6];   // sign 8-bits integer: -32768 and 32767
 
   qmc5883l_read_reg(MAG_DATA_REGISTER,data_buf,elements_of(data_buf));
 
   *mag_x = (int16_t)(data_buf[0] | data_buf[1] << 8);
   *mag_y = (int16_t)(data_buf[2] | data_buf[3] << 8);
   *mag_z = (int16_t)(data_buf[4] | data_buf[5] << 8);
+
+
+
 
 }
 

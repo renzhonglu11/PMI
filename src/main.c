@@ -6,9 +6,10 @@ int main(void)
   clocks_init_pmi();  // default clock frequence is 16 MHz
 
   uart_init_nucusb(115200);
+  init_proj_2();
+  
   ili9341_init(ILI9341_ORIENTATION_90); // initilize the LCD screen
 
-  init_proj_2();
   
 
 

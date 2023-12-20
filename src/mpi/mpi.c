@@ -81,7 +81,7 @@ int32_t spi_txrx(uint8_t *buf, uint32_t size)
          ;
 
       // Read the received byte
-      buf[i] = SPI1->DR;
+      buf[i] = SPI1->DR;    // TODO: BUG cannot receive data correctly
       // uart_tx_int(buf[i]);
    }
 
