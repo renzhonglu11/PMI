@@ -99,21 +99,21 @@ int32_t adxl345_acc_data(float *x, float *y, float *z)
   // 1. read x, y, z from the corresponding resgister (multiple bytes will be read)
   accelerometerData data;
 
-  int8_t data_buf[] = {(DATAX0 | WRITE_BIT | MB_BIT) , 0x00, 0x00,0x00,0x00,0x00,0x00};
+  uint8_t data_buf[] = {(DATAX0 | WRITE_BIT | MB_BIT) , 0x00, 0x00,0x00,0x00,0x00,0x00};
   spi_txrx(data_buf,elements_of(data_buf));
 
 
-  data.x = (int16_t) ((data_buf[1]<<8)|data_buf[0]);
-  data.y = (int16_t)((data_buf[3]<<8)|data_buf[2]);
-  data.z = (int16_t)((data_buf[5]<<8)|data_buf[4]);
+  data.x = (int16_t) ((data_buf[2]<<8)|data_buf[1]);
+  data.y = (int16_t)((data_buf[4]<<8)|data_buf[3]);
+  data.z = (int16_t)((data_buf[6]<<8)|data_buf[5]);
 
 
   
 
   // 2. convert the data to 16-bit signed integers
-  *x = data.x * 3.9 / 1000 * 9.8;
-  *y = data.y * 3.9 / 1000 * 9.8;
-  *z = data.z * 3.9 / 1000 * 9.8;
+  *x = data.x * 4.0 / 1000 * 9.81;
+  *y = data.y * 4.0 / 1000 * 9.81;
+  *z = data.z * 4.0 / 1000 * 9.81;
 
 
   return RC_SUCC;

@@ -6,17 +6,17 @@
 int32_t i2c_init()
 {
   // enable clock of port B
-  RCC->IOPENR |= RCC_IOPENR_IOPBEN;
+  SET_BIT(RCC->IOPENR, RCC_IOPENR_IOPBEN);
   // PB8->SCL, PB9->SDA
-  GPIOB->MODER &= ~(GPIO_MODER_MODE8 | GPIO_MODER_MODE9); // Clear mode bits for pins 8 and 9
-  GPIOB->MODER |= (GPIO_MODER_MODE8_0 | GPIO_MODER_MODE9_0); // Set pins as output
+  CLEAR_BIT(GPIOB->MODER, GPIO_MODER_MODE8 | GPIO_MODER_MODE9); // Clear mode bits for pins 8 and 9
+  SET_BIT(GPIOB->MODER, GPIO_MODER_MODE8_0 | GPIO_MODER_MODE9_0); // Set pins as output
 
-
-  GPIOB->OTYPER |= (GPIO_OTYPER_OT_8 | GPIO_OTYPER_OT_9);    // Set pins as open-drain
-  GPIOB->PUPDR |= (GPIO_PUPDR_PUPD8_0 | GPIO_PUPDR_PUPD9_0); // Enable pull-up
+  SET_BIT(GPIOB->OTYPER, GPIO_OTYPER_OT_8 | GPIO_OTYPER_OT_9);    // Set pins as open-drain
+  SET_BIT(GPIOB->PUPDR, GPIO_PUPDR_PUPD8_0 | GPIO_PUPDR_PUPD9_0); // Enable pull-up
 
   // Set SDA and SCL to high (idle state)
-  GPIOB->BSRR = (SDA_PIN | SCL_PIN);
+  SET_BIT(GPIOB->BSRR, SDA_PIN | SCL_PIN);
+
 
   return RC_ERR;
 }
