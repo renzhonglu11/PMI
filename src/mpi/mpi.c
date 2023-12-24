@@ -102,6 +102,7 @@ uint32_t init_proj_2(void)
 {
   adxl345_init();
   qmc5883l_init();
+  init_ds18b20();
 
   return RC_SUCC;
 }

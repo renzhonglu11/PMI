@@ -7,10 +7,9 @@ int main(void)
 
   uart_init_nucusb(115200);
   init_proj_2();
-  uint8_t test = init_ds18b20();
   ili9341_init(ILI9341_ORIENTATION_90); // initilize the LCD screen
-
   
+  DS18B20_faster_resolution();
 
 
   while (1)
@@ -20,7 +19,7 @@ int main(void)
 
     // output_data(); // output all the data from sensors
 
-    // systick_delay_ms(3000);
+
     
     // if(OneWire_Reset())
     // {
@@ -34,13 +33,13 @@ int main(void)
     // }
     float temp;
     char T_ow[30];
-    temp = DS18B20_Get_Temp();
+    DS18B20_Get_Temp(&temp);
 
     float2str(T_ow,elements_of(T_ow),temp,2);
     uart_tx_str(T_ow);
     uart_tx_str("\n");
-
-    systick_delay_ms(400);
+    
+    systick_delay_ms(300);
 
   }
 }

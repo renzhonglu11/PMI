@@ -1,11 +1,9 @@
 #include <ds18b20.h>
 
-#define DS18B20_CMD_CONVERTTEMP 0x44
-#define DS18B20_CMD_READSCRATCHPAD 0xBE
 
-
-void OneWire_Reset();
+void DS18B20_Reset();
 uint8_t DS18B20_Check(void);
+
 
 uint8_t init_ds18b20()
 {
@@ -21,16 +19,14 @@ uint8_t init_ds18b20()
   SET_BIT(GPIOB->PUPDR, GPIO_PUPDR_PUPD13_0); // Enable pull-up
 
   ONE_WIRE_PORT->BSRR = OW_PIN;
-  OneWire_Reset();
+  DS18B20_Reset();
 
   // return RC_SUCC;
   return DS18B20_Check();
 }
 
-void OneWire_Reset()
+void DS18B20_Reset()
 {
-
-  uint8_t response;
 
   ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13);  // clear mode bits for pin 13
   ONE_WIRE_PORT->MODER |= (GPIO_MODER_MODE13_0); // set pin as output
@@ -42,15 +38,10 @@ void OneWire_Reset()
   ONE_WIRE_PORT->BSRR = OW_PIN;
 
   // set pin 13 as input mode
-  // ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // clear mode bits for pin 13
   OW_DELAY_RST_WAIT();
-  
-  // response = (ONE_WIRE_PORT->IDR & OW_PIN) ? 0 : 1;
 
-  // return response;
+
 }
-
-
 
 void DS18B20_WriteBit(uint8_t bit)
 {
@@ -62,7 +53,7 @@ void DS18B20_WriteBit(uint8_t bit)
   {
     // Write '1'
     GPIOB->BRR |= GPIO_BRR_BR_13; // Pull low
-    DELAY2US();
+    DELAY1US();
     GPIOB->BSRR |= GPIO_BSRR_BS_13; // Release line
     OW_DELAY_WRITE();
   }
@@ -72,28 +63,23 @@ void DS18B20_WriteBit(uint8_t bit)
     GPIOB->BRR |= GPIO_BRR_BR_13; // Pull low
     OW_DELAY_WRITE();
     GPIOB->BSRR |= GPIO_BSRR_BS_13; // Release line
-    DELAY2US();
+    DELAY1US();
   }
 
-  // // Recovery time
-  // for (int i = 0; i < 4; i++) { // 4 * 20 nops = ~80 cycles
-  //     nop_20();
-  // }
 }
 
-void OneWire_WriteByte(uint8_t byte)
+void DS18B20_WriteByte(uint8_t byte)
 {
   uint8_t byte_mask = 0x01;
 
   for (int i = 0; i < 8; i++)
   {
     DS18B20_WriteBit(byte & byte_mask); // Write the LSB
-    // byte >>= 1; // Shift right to move the next bit into the LSB position
     byte_mask = byte_mask << 1;
   }
 }
 
-int OneWire_ReadBit(void)
+uint8_t DS18B20_ReadBit(void)
 {
   uint8_t bit;
 
@@ -102,35 +88,35 @@ int OneWire_ReadBit(void)
 
   // Initiate read timeslot
   ONE_WIRE_PORT->BRR = OW_PIN; // Pull low
-  DELAY2US();
+  DELAY2US(); 
   ONE_WIRE_PORT->BSRR = OW_PIN; // release line
 
   // Configure PB13 as input
   ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // clear mode bits for pin 13
 
-  DELAY12US();
+  // DELAY12US();
+  nop_100(); nop_50(); nop_30();  // better!!
 
   bit = (GPIOB->IDR & OW_PIN) ? 1 : 0;
 
-  OW_DELAY_READ(); // Complete the timeslot
+  // OW_DELAY_READ(); // 50 us
+  nop_100(); nop_50(); nop_30();nop_500();nop_50();  // better!!
 
   return bit;
 }
 
 uint8_t DS18B20_ReadByte(void)
 {
-  uint8_t byte = 0;
-
-  for (int i = 0; i < 8; i++)
-  {
-    if (OneWire_ReadBit())
-    {
-      byte |= (1 << i);
-    }
-  }
-
-  return byte;
+  
+  uint8_t i = 8, byte = 0;
+	while (i--) {
+		byte >>= 1;
+		byte |= (DS18B20_ReadBit() << 7);
+	}
+	
+	return byte;
 }
+
 
 uint8_t DS18B20_Check(void)
 {
@@ -138,69 +124,96 @@ uint8_t DS18B20_Check(void)
   // set pin 13 as input mode
   ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // clear mode bits for pin 13
 
-  while(((ONE_WIRE_PORT->IDR & OW_PIN)==1)&&retry<200)
+  while (((ONE_WIRE_PORT->IDR & OW_PIN) == 1) && retry < 220)
   {
     retry++;
     DELAY1US();
   }
-  if(retry>=200)return 1;
-  else retry=0;
+  if (retry >= 220)
+    return 1;
+  else
+    retry = 0;
 
-  while(((ONE_WIRE_PORT->IDR & OW_PIN)!=1)&&retry<240)
+  while (((ONE_WIRE_PORT->IDR & OW_PIN) != 1) && retry < 255)
   {
     retry++;
     DELAY1US();
-
   }
-  if(retry>=240) return 1;
+  if (retry >= 255)
+    return 1;
   return 0;
+}
+
+
+void EnableStrongPullUp(void) {
+    ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // Clear mode bits for PB13
+    ONE_WIRE_PORT->MODER |= GPIO_MODER_MODE13_0; // Set PB13 as General Purpose Output Mode
+    ONE_WIRE_PORT->OTYPER &= ~(GPIO_OTYPER_OT_13); // Set to Push-Pull
+    ONE_WIRE_PORT->BSRR = OW_PIN; // Drive the line high
+}
+
+void DisableStrongPullUp(void) {
+    ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // Clear mode bits for PB13
+    ONE_WIRE_PORT->MODER |= GPIO_MODER_MODE13_0; // Set PB13 as Output
+    ONE_WIRE_PORT->OTYPER |= GPIO_OTYPER_OT_13; // Set back to Open-Drain
+    ONE_WIRE_PORT->PUPDR |= GPIO_PUPDR_PUPD13_0; // Enable Pull-Up
 }
 
 
 void DS185B20_Start()
 {
-  OneWire_Reset();
+  DS18B20_Reset();
   DS18B20_Check();
-  OneWire_WriteByte(0xCC);
-  OneWire_WriteByte(0x44);
+  DS18B20_WriteByte(0xCC);
+  DS18B20_WriteByte(DS18B20_CMD_CONVERTTEMP);
+  
 }
 
 
-float DS18B20_Get_Temp(void)
+
+
+uint32_t DS18B20_Get_Temp(float * temperature)
 {
-  uint16_t temp_raw;
-  float temperature;
+  uint16_t temp_raw = 0;  
+  uint8_t lsb, msb;
+  uint8_t temp;
 
-  // Reset and check if the device is present
-
-
-  // Send 'Skip ROM' command to address all devices
-  DS185B20_Start();
-  OneWire_Reset();
-  DS18B20_Check();
   // Start temperature conversion
-  // OneWire_WriteByte(DS18B20_CMD_CONVERTTEMP);
+  DS185B20_Start();
+  
+  // WE NEED STRONG PULL UP TO ENSURE SUFFICIENT SUPPLY CURRENT!! (ds18b20 page 7)
+  EnableStrongPullUp();
+  systick_delay_ms(110);  // after changing to faster resolution, delay is now shorter now.
+  DisableStrongPullUp();
 
-  // systick_delay_ms(800);
+  // ready to read data from sensor
+  DS18B20_Reset();
+  DS18B20_Check();
+  DS18B20_WriteByte(0xCC);
+  DS18B20_WriteByte(DS18B20_CMD_READSCRATCHPAD);
 
-  // if (!OneWire_Reset())
-  // {
-  //   return -999.0; // Error or no device present
-  // }
+  
+  // Read the first two bytes (LSB and MSB) from the scratchpad
+  lsb = DS18B20_ReadByte();
+  msb = DS18B20_ReadByte();
 
-  // // Send 'Skip ROM' command again before reading scratchpad
-  // OneWire_WriteByte(0xCC);
 
-  // OneWire_WriteByte(DS18B20_CMD_READSCRATCHPAD);
+  temp_raw = (uint16_t)((msb << 8) | lsb);
+  *temperature = (float) temp_raw / 16.0;
 
-  // // Read the first two bytes (LSB and MSB) from the scratchpad
-  // uint8_t lsb = DS18B20_ReadByte();
-  // uint8_t msb = DS18B20_ReadByte();
+  return RC_SUCC;
+}
 
-  // temp_raw = (msb << 8) | lsb;
 
-  // // Convert raw value to Celsius
-  // temperature = (float)temp_raw / 16.0;
+uint32_t DS18B20_faster_resolution(void)
+{
+  DS18B20_Reset();
+  DS18B20_Check();
+  DS18B20_WriteByte(0xCC);
+  DS18B20_WriteByte(0x4e);
+  DS18B20_WriteByte(0x00);   // useless
+  DS18B20_WriteByte(0x00);   // useless
+  DS18B20_WriteByte(0x1f);
 
-  return temperature;
+  return RC_SUCC;
 }
