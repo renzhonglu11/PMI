@@ -15,31 +15,10 @@ int main(void)
   while (1)
   {
     
-    // _qmc5883l_internal_test();  // testing I2C
-
-    // output_data(); // output all the data from sensors
-
-
-    
-    // if(OneWire_Reset())
-    // {
-    //   uart_tx_str("OneWire_Reset() is working\n");
-
-    // }
-    // else
-    // {
-    //   uart_tx_str("OneWire_Reset() is not working\n");
-
-    // }
-    float temp;
-    char T_ow[30];
-    DS18B20_Get_Temp(&temp);
-
-    float2str(T_ow,elements_of(T_ow),temp,2);
-    uart_tx_str(T_ow);
+    send_sensor_data_over_UART();
     uart_tx_str("\n");
     
-    systick_delay_ms(300);
+    systick_delay_ms(500);
 
   }
 }

@@ -108,8 +108,11 @@ void qmc5883l_get_raw_data(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z)
 
   // convert data into milli gauss
   // 0.92?? 
+  *mag_x *= 0.92;
+  *mag_y *= 0.92;
+  *mag_z *= 0.92;
 
 
-  // TODO: maybe add some delay here??? 
+ 
 }
 

@@ -1,79 +1,60 @@
 #include <my_utils.h>
 
+#define MAX_STRING_LENGTH 200
+
 uint32_t _get_formated_qmc5883_data(char *output_str);
 uint32_t _get_formated_adxl345_data(char *output_str);
 
 /// @brief Output the formating string of data from all sensors
 /// @param
 /// @return RC_SUCC
-uint32_t output_data(void)
+uint32_t get_output_data(char *outputString)
 {
-  float x = 0.0;
-  float y = 0.0;
-  float z = 0.0;
 
-  char output_str[50];
-
-  _get_formated_adxl345_data(output_str);
-  uart_tx_str(output_str);
-  uart_tx_char('\n');
-
-  memset(output_str, 0, sizeof(output_str)); // empty output_str
-
-  _get_formated_qmc5883_data(output_str);
-  uart_tx_str(output_str);
-  uart_tx_char('\n');
-
-  return RC_SUCC;
-}
-
-uint32_t _get_formated_adxl345_data(char *output_str)
-{
-  float x = 0.0;
-  float y = 0.0;
-  float z = 0.0;
-
-  // TODO: formating string better
-
-  int32_t success_get_data = adxl345_acc_data(&x, &y, &z);
-
-
-  char x_accel_str[30];
-  char y_accel_str[30];
-  char z_accel_str[30];
-  char x_str[30];
-  char y_str[30];
-  char z_str[30];
-  float2str(x_accel_str, elements_of(x_accel_str), x, 4);
-  float2str(y_accel_str, elements_of(y_accel_str), y, 4);
-  float2str(z_accel_str, elements_of(z_accel_str), z, 4);
-
-  sprintf(x_str, "x  %s \n", x_accel_str);
-  uart_tx_str(x_str);
-  sprintf(y_str, "y  %s \n", y_accel_str);
-  uart_tx_str(y_str);
-  sprintf(z_str, "z  %s \n", z_accel_str);
-  uart_tx_str(z_str);
-
-  // strncat(output_str, ", ", sizeof(output_str) - strlen(output_str) - 1);
-
-  // // Convert y to string and append to output_str
-  // float2str(output_str + strlen(output_str), elements_of(output_str) - strlen(output_str), y, 3);
-
-  // // Append another delimiter
-  // strncat(output_str, ", ", sizeof(output_str) - strlen(output_str) - 1);
-
-  // // Convert z to string and append to output_str
-  // float2str(output_str + strlen(output_str), elements_of(output_str) - strlen(output_str), z, 3);
-
-  return RC_SUCC;
-}
-
-uint32_t _get_formated_qmc5883_data(char *output_str)
-{
+  float acc_x, acc_y, acc_z;
   int16_t mag_x, mag_y, mag_z;
+  float temperature;
+  char tempString[MAX_STRING_LENGTH];
+  char floatBuf[32]; // Buffer for individual float-to-string conversions
+
+  adxl345_acc_data(&acc_x, &acc_y, &acc_z);
   qmc5883l_get_raw_data(&mag_x, &mag_y, &mag_z);
-  sprintf(output_str, "x = %d, y= %d, z= %d", mag_x, mag_y, mag_z);
+  DS18B20_Get_Temp(&temperature);
+
+  // Convert accelerometer data
+  float2str(floatBuf, sizeof(floatBuf), acc_x, 2);
+  snprintf(tempString, MAX_STRING_LENGTH, "ACC: X=%s ", floatBuf);
+  float2str(floatBuf, sizeof(floatBuf), acc_y, 2);
+  strncat(tempString, "Y=", MAX_STRING_LENGTH - strlen(tempString));
+  strncat(tempString, floatBuf, MAX_STRING_LENGTH - strlen(tempString));
+  float2str(floatBuf, sizeof(floatBuf), acc_z, 2);
+  strncat(tempString, " Z=", MAX_STRING_LENGTH - strlen(tempString));
+  strncat(tempString, floatBuf, MAX_STRING_LENGTH - strlen(tempString));
+
+  // Add magnetometer data
+  snprintf(floatBuf, sizeof(floatBuf), " | MAG: X=%d Y=%d Z=%d", mag_x, mag_y, mag_z);
+  strncat(tempString, floatBuf, MAX_STRING_LENGTH - strlen(tempString));
+
+  // Convert and add temperature data
+  float2str(floatBuf, sizeof(floatBuf), temperature, 2);
+  strncat(tempString, " | TEMP: ", MAX_STRING_LENGTH - strlen(tempString));
+  strncat(tempString, floatBuf, MAX_STRING_LENGTH - strlen(tempString));
+  strncat(tempString, "C", MAX_STRING_LENGTH - strlen(tempString));
+
+  // Copy to output string
+  strncpy(outputString, tempString, MAX_STRING_LENGTH);
+
+
 
   return RC_SUCC;
 }
+
+void send_sensor_data_over_UART()
+{
+  char sensorDataString[MAX_STRING_LENGTH];
+  get_output_data(sensorDataString);
+
+  // Send the string over UART
+  uart_tx_str(sensorDataString);
+}
+
