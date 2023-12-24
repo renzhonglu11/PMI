@@ -2,8 +2,67 @@
 
 #define MAX_STRING_LENGTH 200
 
-uint32_t _get_formated_qmc5883_data(char *output_str);
-uint32_t _get_formated_adxl345_data(char *output_str);
+void ClearLine(uint8_t line)
+{
+  struct display_info_s dispInfo = ili9341_display_info_get();
+    uint16_t lineHeight = dispInfo.font_height; // Assuming one line per font height
+    uint16_t yStart = line * lineHeight;
+
+    ili9341_rect_fill(0, yStart, dispInfo.width, lineHeight, ILI9341_COLOR_BLACK);
+}
+
+
+
+
+
+void display_sensor_data(float acc_x, float acc_y, float acc_z, int16_t mag_x, int16_t mag_y, int16_t mag_z, float temperature)
+{
+  char strBuffer[120];
+  char floatBuf[32]; // Buffer for individual float-to-string conversions
+  uint16_t strLength = sizeof(strBuffer);
+
+  // Clear lines before updating
+  for (uint8_t i = 0; i < 7; i++)
+  {
+    ClearLine(i);
+  }
+
+  // Convert and format Accelerometer Data
+  float2str(floatBuf, sizeof(floatBuf), acc_x, 2);
+  snprintf(strBuffer, strLength, "ACC X = \t %s", floatBuf);
+  ili9341_text_pos_set(0, 0); // Set position for first line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+  float2str(floatBuf, sizeof(floatBuf), acc_y, 2);
+  snprintf(strBuffer, strLength, "ACC Y = \t %s", floatBuf);
+  ili9341_text_pos_set(0, 1); // Set position for second line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+  float2str(floatBuf, sizeof(floatBuf), acc_z, 2);
+  snprintf(strBuffer, strLength, "ACC Z = \t %s", floatBuf);
+  ili9341_text_pos_set(0, 2); // Set position for third line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+  // Format and display Magnetometer Data
+  snprintf(strBuffer, strLength, "MAG X = \t %d", mag_x);
+  ili9341_text_pos_set(0, 3); // Set position for fourth line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+  snprintf(strBuffer, strLength, "MAG Y = \t %d", mag_y);
+  ili9341_text_pos_set(0, 4); // Set position for fifth line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+  snprintf(strBuffer, strLength, "MAG Z = \t %d", mag_z);
+  ili9341_text_pos_set(0, 5); // Set position for sixth line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+  // Convert and format Temperature Data
+  float2str(floatBuf, sizeof(floatBuf), temperature, 2);
+  snprintf(strBuffer, strLength, "TEMP: %s C", floatBuf);
+  ili9341_text_pos_set(0, 6); // Set position for seventh line
+  ili9341_str_print(strBuffer, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+
+}
 
 /// @brief Output the formating string of data from all sensors
 /// @param
@@ -20,6 +79,9 @@ uint32_t get_output_data(char *outputString)
   adxl345_acc_data(&acc_x, &acc_y, &acc_z);
   qmc5883l_get_raw_data(&mag_x, &mag_y, &mag_z);
   DS18B20_Get_Temp(&temperature);
+
+  display_sensor_data(acc_x, acc_y, acc_z, mag_x, mag_y, mag_z, temperature);
+ 
 
   // Convert accelerometer data
   float2str(floatBuf, sizeof(floatBuf), acc_x, 2);
@@ -44,8 +106,6 @@ uint32_t get_output_data(char *outputString)
   // Copy to output string
   strncpy(outputString, tempString, MAX_STRING_LENGTH);
 
-
-
   return RC_SUCC;
 }
 
@@ -57,4 +117,3 @@ void send_sensor_data_over_UART()
   // Send the string over UART
   uart_tx_str(sensorDataString);
 }
-
