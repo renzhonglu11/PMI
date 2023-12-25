@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <uart.h>
 #include <systick.h>
-#include <mpi.h>
+#include <spi.h>
 
 #define WRITE_BIT 0x80 // 1000 0000
 #define MB_BIT 0x40    // 0100 0000

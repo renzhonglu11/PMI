@@ -6,18 +6,13 @@
 /// @param data Data to be read
 void qmc5883l_write_reg(uint8_t reg, uint8_t data)
 {
-  // uint8_t buf[2];
-  // buf[0] = reg;
-  // buf[1] = data;
-
-  // i2c_write(QMC5883L_ADDR, buf, 2);
-
   I2C_start();
   I2C_WriteByte(QMC5883L_ADDR << 1);
   I2C_WriteByte(reg);
   I2C_WriteByte(data);
   I2C_stop();
 }
+
 
 /// @brief Read data from register of qmc5883
 /// @param reg_address Register address to be read
@@ -105,7 +100,6 @@ void qmc5883l_get_raw_data(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z)
   *mag_z = (int16_t)(data_buf[4] | data_buf[5] << 8);
 
 
-
   // convert data into milli gauss
   // 0.92?? 
   *mag_x *= 0.92;
@@ -113,6 +107,5 @@ void qmc5883l_get_raw_data(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z)
   *mag_z *= 0.92;
 
 
- 
 }
 

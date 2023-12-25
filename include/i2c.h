@@ -43,11 +43,6 @@
 
 #define I2C_DELAY nop_20()
 
-// SDA: low, high; SCL: low, high
-// #define SDA_HIGH GPIOB->BSRR |= GPIO_BSRR_BS_9
-// #define SDA_LOW GPIOB->BSRR |= GPIO_BSRR_BR_9
-// #define SCL_HIGH GPIOB->BSRR |= GPIO_BSRR_BS_8
-// #define SCL_LOW GPIOB->BSRR |= GPIO_BSRR_BR_8
 
 
 int32_t i2c_init();

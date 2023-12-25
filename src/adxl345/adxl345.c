@@ -1,5 +1,15 @@
 #include <adxl345.h>
 
+
+
+
+/**
+ * @brief Initializes the ADXL345 sensor.
+ * 
+ * This function initializes the ADXL345 sensor and prepares it for data acquisition.
+ * 
+ * @return int32_t Returns 0 on success, or a negative error code on failure.
+ */
 int32_t adxl345_init(void)
 {
   spi_init_adxl345();
@@ -53,20 +63,13 @@ int32_t adxl345_init(void)
   return RC_SUCC;
 }
 
-int32_t adxl345_read_xyz(float *x, float *y, float *z)
-{
-  // need to take a deep look at the datasheet of adxl345
-
-  // 1. Read data from sensor (x, y, z)
-
-  // 2. Convert data to 16-bit signed integers
-
-  // 3. Return data
-
-  return RC_SUCC;
-}
 
 
+/**
+ * @brief This function is used to test the ADXL345 sensor.
+ *
+ * @return int32_t Returns the result of the test.
+ */
 int32_t _test_adxl345(void)
 {
 
@@ -86,12 +89,20 @@ int32_t _test_adxl345(void)
   return RC_SUCC;
 }
 
-/// @brief get the datas from sensor
-/// @param x 
-/// @param y 
-/// @param z 
-/// @return RC_SUCC
 
+
+/**
+ * @brief Reads the accelerometer data from the ADXL345 sensor.
+ *
+ * This function reads the X, Y, and Z axis accelerometer data from the ADXL345 sensor
+ * and stores the values in the provided variables.
+ *
+ * @param x Pointer to a float variable to store the X axis accelerometer data.
+ * @param y Pointer to a float variable to store the Y axis accelerometer data.
+ * @param z Pointer to a float variable to store the Z axis accelerometer data.
+ *
+ * @return Returns 0 on success, or a negative error code on failure.
+ */
 int32_t adxl345_acc_data(float *x, float *y, float *z)
 {
   // TODO: data are a little bit strange, it still need to be checked
@@ -107,8 +118,6 @@ int32_t adxl345_acc_data(float *x, float *y, float *z)
   data.y = (int16_t)((data_buf[4]<<8)|data_buf[3]);
   data.z = (int16_t)((data_buf[6]<<8)|data_buf[5]);
 
-
-  
 
   // 2. convert the data to 16-bit signed integers
   *x = data.x * 4.0 / 1000 * 9.81;

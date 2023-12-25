@@ -5,6 +5,14 @@ void DS18B20_Reset();
 uint8_t DS18B20_Check(void);
 
 
+/**
+ * @brief Initializes the DS18B20 temperature sensor.
+ *
+ * This function initializes the DS18B20 temperature sensor by performing any necessary setup
+ * operations. It returns a uint8_t value indicating the success or failure of the initialization.
+ *
+ * @return uint8_t Returns 0 if the initialization is successful, otherwise returns an error code.
+ */
 uint8_t init_ds18b20()
 {
   RCC->IOPENR |= RCC_IOPENR_GPIOBEN; // enable clock for GPIOB
@@ -21,10 +29,13 @@ uint8_t init_ds18b20()
   ONE_WIRE_PORT->BSRR = OW_PIN;
   DS18B20_Reset();
 
-  // return RC_SUCC;
+  
   return DS18B20_Check();
 }
 
+/**
+ * @brief Resets the DS18B20 temperature sensor.
+ */
 void DS18B20_Reset()
 {
 
@@ -43,6 +54,13 @@ void DS18B20_Reset()
 
 }
 
+/**
+ * @brief Writes a single bit to the DS18B20 sensor.
+ *
+ * This function is used to write a single bit to the DS18B20 sensor.
+ *
+ * @param bit The bit value to be written (0 or 1).
+ */
 void DS18B20_WriteBit(uint8_t bit)
 {
   // Set the pin as output
@@ -68,6 +86,13 @@ void DS18B20_WriteBit(uint8_t bit)
 
 }
 
+/**
+ * @brief Writes a byte to the DS18B20 sensor.
+ *
+ * This function is used to write a byte of data to the DS18B20 sensor.
+ *
+ * @param byte The byte of data to be written.
+ */
 void DS18B20_WriteByte(uint8_t byte)
 {
   uint8_t byte_mask = 0x01;
@@ -79,6 +104,11 @@ void DS18B20_WriteByte(uint8_t byte)
   }
 }
 
+/**
+ * @brief Reads a single bit from the DS18B20 temperature sensor.
+ * 
+ * @return The value of the read bit (0 or 1).
+ */
 uint8_t DS18B20_ReadBit(void)
 {
   uint8_t bit;
@@ -105,6 +135,11 @@ uint8_t DS18B20_ReadBit(void)
   return bit;
 }
 
+/**
+ * @brief Reads a byte from the DS18B20 temperature sensor.
+ *
+ * @return The byte read from the sensor.
+ */
 uint8_t DS18B20_ReadByte(void)
 {
   
@@ -117,7 +152,10 @@ uint8_t DS18B20_ReadByte(void)
 	return byte;
 }
 
-
+/**
+ * @brief Checks the status of the DS18B20 temperature sensor.
+ * @return The status of the DS18B20 temperature sensor.
+ */
 uint8_t DS18B20_Check(void)
 {
   uint8_t retry = 0;
@@ -145,6 +183,14 @@ uint8_t DS18B20_Check(void)
 }
 
 
+/**
+ * @brief Enables the strong pull-up feature for the DS18B20 temperature sensor.
+ * 
+ * This function is used to enable the strong pull-up feature of the DS18B20 temperature sensor.
+ * The strong pull-up feature is used to provide additional power to the sensor during temperature
+ * conversion, which can reduce conversion time. This function should be called before starting
+ * temperature conversion.
+ */
 void EnableStrongPullUp(void) {
     ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // Clear mode bits for PB13
     ONE_WIRE_PORT->MODER |= GPIO_MODER_MODE13_0; // Set PB13 as General Purpose Output Mode
@@ -152,6 +198,9 @@ void EnableStrongPullUp(void) {
     ONE_WIRE_PORT->BSRR = OW_PIN; // Drive the line high
 }
 
+/**
+ * @brief Disables the strong pull-up feature of the DS18B20 temperature sensor.
+ */
 void DisableStrongPullUp(void) {
     ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // Clear mode bits for PB13
     ONE_WIRE_PORT->MODER |= GPIO_MODER_MODE13_0; // Set PB13 as Output
@@ -160,6 +209,9 @@ void DisableStrongPullUp(void) {
 }
 
 
+/**
+ * @brief Starts the DS185B20 temperature sensor.
+ */
 void DS185B20_Start()
 {
   DS18B20_Reset();
@@ -170,8 +222,14 @@ void DS185B20_Start()
 }
 
 
-
-
+/**
+ * @brief Retrieves the temperature from the DS18B20 sensor.
+ *
+ * This function reads the temperature value from the DS18B20 sensor and stores it in the provided variable.
+ *
+ * @param temperature Pointer to a float variable where the temperature value will be stored.
+ * @return uint32_t Returns a status code indicating the success or failure of the operation.
+ */
 uint32_t DS18B20_Get_Temp(float * temperature)
 {
   uint16_t temp_raw = 0;  
@@ -205,6 +263,16 @@ uint32_t DS18B20_Get_Temp(float * temperature)
 }
 
 
+/**
+ * @brief Sets the DS18B20 temperature sensor to a faster resolution.
+ * 
+ * This function adjusts the resolution of the DS18B20 temperature sensor to a faster setting.
+ * The resolution determines the number of bits used to represent the temperature value, which
+ * affects the accuracy and conversion time of the sensor. By setting a faster resolution, the
+ * sensor will provide temperature readings more quickly, but with reduced accuracy.
+ * 
+ * @return The new resolution setting of the DS18B20 temperature sensor.
+ */
 uint32_t DS18B20_faster_resolution(void)
 {
   DS18B20_Reset();

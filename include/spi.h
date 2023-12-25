@@ -1,5 +1,5 @@
-#ifndef MPI_H
-#define MPI_H
+#ifndef SPI_H
+#define SPI_H
 
 #include <pmi_stddefs.h>
 #include <uart.h>
@@ -18,4 +18,4 @@ int32_t spi_init_adxl345 ( void );
 int32_t spi_txrx ( uint8_t * buf , uint32_t size );
 uint32_t init_proj_2(void);
 
-#endif /* MPI_H */
+#endif /* SPI_H */

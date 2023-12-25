@@ -1,9 +1,15 @@
-#include <mpi.h>
+#include <spi.h>
 #include <stm32l0xx.h>
 #include <stdio.h>
 
 // for more information see datasheet adxl345 since page 14
 
+
+/**
+ * Initializes the ADXL345 sensor for SPI communication.
+ *
+ * @return The status code indicating the success of the initialization.
+ */
 int32_t spi_init_adxl345(void)
 {
   /*
@@ -44,6 +50,16 @@ int32_t spi_init_adxl345(void)
   return RC_SUCC;
 }
 
+
+/**
+ * @brief Performs SPI transmission and reception.
+ *
+ * This function transmits and receives data over SPI.
+ *
+ * @param buf Pointer to the buffer containing the data to be transmitted and to store the received data.
+ * @param size The size of the data in bytes.
+ * @return Returns an int32_t value indicating the success or failure of the SPI transaction.
+ */
 int32_t spi_txrx(uint8_t *buf, uint32_t size)
 {
   /*
@@ -52,7 +68,6 @@ int32_t spi_txrx(uint8_t *buf, uint32_t size)
   a byte from the buffer to the SPI1->DR register to transmit it.
   Receive: It waits for the receive buffer to be not empty (checked using SPI_SR_RXNE in the SPI1->SR register)
   and then reads a byte from the SPI1->DR register. The received byte can be stored back in the buffer or processed as needed.
-
   */
 
   // pull down CS line of the corresponding GPIO
@@ -85,8 +100,8 @@ int32_t spi_txrx(uint8_t *buf, uint32_t size)
     };
 
     // Read the received byte
-    buf[i] = SPI1->DR; // TODO: BUG cannot receive data correctly
-                       // uart_tx_int(buf[i]);
+    buf[i] = SPI1->DR; 
+                       
   }
 
   // pull up CS again
@@ -95,14 +110,3 @@ int32_t spi_txrx(uint8_t *buf, uint32_t size)
   return RC_SUCC;
 }
 
-/// @brief Initilize all the bus systems and sensors in project 2.
-/// @param
-/// @return RC_SUCC
-uint32_t init_proj_2(void)
-{
-  adxl345_init();
-  qmc5883l_init();
-  init_ds18b20();
-
-  return RC_SUCC;
-}

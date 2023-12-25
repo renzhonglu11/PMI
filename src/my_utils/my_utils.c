@@ -2,6 +2,13 @@
 
 #define MAX_STRING_LENGTH 200
 
+
+
+/**
+ * @brief Clears the specified line on the display.
+ *
+ * @param line The line number to clear.
+ */
 void ClearLine(uint8_t line)
 {
   struct display_info_s dispInfo = ili9341_display_info_get();
@@ -14,7 +21,20 @@ void ClearLine(uint8_t line)
 
 
 
-
+/**
+ * @brief Displays the sensor data.
+ *
+ * This function takes in the accelerometer and magnetometer data along with the temperature
+ * and displays it.
+ *
+ * @param acc_x The X-axis accelerometer value.
+ * @param acc_y The Y-axis accelerometer value.
+ * @param acc_z The Z-axis accelerometer value.
+ * @param mag_x The X-axis magnetometer value.
+ * @param mag_y The Y-axis magnetometer value.
+ * @param mag_z The Z-axis magnetometer value.
+ * @param temperature The temperature value.
+ */
 void display_sensor_data(float acc_x, float acc_y, float acc_z, int16_t mag_x, int16_t mag_y, int16_t mag_z, float temperature)
 {
   char strBuffer[120];
@@ -109,6 +129,17 @@ uint32_t get_output_data(char *outputString)
   return RC_SUCC;
 }
 
+
+/**
+ * @brief Sends sensor data over UART.
+ * 
+ * This function is responsible for sending sensor data over UART communication.
+ * It can be used to transmit sensor readings to another device or system.
+ * 
+ * @note Make sure to initialize the UART communication before calling this function.
+ * 
+ * @return None.
+ */
 void send_sensor_data_over_UART()
 {
   char sensorDataString[MAX_STRING_LENGTH];
