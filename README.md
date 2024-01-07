@@ -2,11 +2,10 @@
 
 ## SPI
 
-
-
-
 ## ADXL345
+
 (if something does not work, refer back to the datasheet)
+
 ### Data Registers
 
 According to the ADXL345 datasheet, the data for each axis is stored in the following registers:
@@ -36,18 +35,15 @@ Open-drain allows device on the bus to pull the line low to trainsmit a '0' and 
 3. Simplicity and reliability
 4. There's no risk of one device trying to drive the line high while another tries to drive it low. Such a situation, if it were to occur, would create a direct path from the positive voltage supply to ground, resulting in a short circuit.
 
-
 ### Notes of I2C:
 
 **Simultaneous Actions**: If one device pulls the line low (to send a '0') while another device releases the line (either to send a '1' or to stop communicating), the action of pulling the line low will dominate. This is because the low state is an active state, where the line is physically connected to ground, whereas the high state is passive, relying only on the pull-up resistor.
-
-
 
 ## TODO
 
 - [x] SPI
 - [x] software-based I2C
-- [ ] one-wire protocol
-- [ ] get correct and formated data from adxl345
-- [ ] get correct and formated data from qmc5883
-- [ ] get correct and formated data from ds18b20
+- [x] one-wire protocol
+- [x] get correct and formated data from adxl345
+- [x] get correct and formated data from qmc5883
+- [x] get correct and formated data from ds18b20
