@@ -29,7 +29,6 @@ uint8_t init_ds18b20()
   ONE_WIRE_PORT->BSRR = OW_PIN;
   DS18B20_Reset();
 
-  
   return DS18B20_Check();
 }
 
@@ -162,7 +161,7 @@ uint8_t DS18B20_Check(void)
   // set pin 13 as input mode
   ONE_WIRE_PORT->MODER &= ~(GPIO_MODER_MODE13); // clear mode bits for pin 13
 
-  while (((ONE_WIRE_PORT->IDR & OW_PIN) == 1) && retry < 220)
+  while (((ONE_WIRE_PORT->IDR & OW_PIN) == OW_PIN) && retry < 220)
   {
     retry++;
     DELAY1US();
@@ -172,12 +171,12 @@ uint8_t DS18B20_Check(void)
   else
     retry = 0;
 
-  while (((ONE_WIRE_PORT->IDR & OW_PIN) != 1) && retry < 255)
+  while (((ONE_WIRE_PORT->IDR & OW_PIN) != OW_PIN) && retry < 255)
   {
     retry++;
     DELAY1US();
   }
-  if (retry >= 255)
+  if (retry > 255)
     return 1;
   return 0;
 }

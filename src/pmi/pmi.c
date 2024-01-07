@@ -13,7 +13,11 @@ uint32_t init_proj_2(void)
 {
   adxl345_init();
   qmc5883l_init();
-  init_ds18b20();
+  while(init_ds18b20()==1)
+  {
+    uart_tx_str("ds18b20 init fails!\n");
+    systick_delay_ms(1000);  // wait for 1 sec
+  }
   ili9341_init(ILI9341_ORIENTATION_90); // initilize the LCD screen
 
   return RC_SUCC;
