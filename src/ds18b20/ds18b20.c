@@ -240,7 +240,8 @@ uint32_t DS18B20_Get_Temp(float * temperature)
   
   // WE NEED STRONG PULL UP TO ENSURE SUFFICIENT SUPPLY CURRENT!! (ds18b20 page 7)
   EnableStrongPullUp();
-  systick_delay_ms(500);  // after changing to faster resolution, delay is now shorter now.
+  // systick_delay_ms(200); // after changing to faster resolution, delay is now shorter now.
+  systick_delay_ms(800);  
   DisableStrongPullUp();
 
   // ready to read data from sensor
@@ -255,8 +256,14 @@ uint32_t DS18B20_Get_Temp(float * temperature)
   msb = DS18B20_ReadByte();
 
 
-  temp_raw = (int16_t)((msb << 8) | lsb);
-
+  temp_raw = ((msb << 8) | lsb);
+  if (temp_raw & 0x8000)
+  {
+    temp_raw = (~temp_raw +1);
+    *temperature = -(float) temp_raw / 16.0;
+    return RC_SUCC;
+  }
+  
   *temperature = (float) temp_raw / 16.0;
 
   return RC_SUCC;
