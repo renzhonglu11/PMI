@@ -5,14 +5,20 @@
 #include "pmi_stddefs.h"
 #include "uart.h"
 #include "adc.h"
+#include "ili9341.h"
+#include <systick.h>
 
+#define BUFFER_SIZE 240
+#define PRE_TRIGGER_COUNT 120
+#define POST_TRIGGER_COUNT 120
 
-
-
-
+uint16_t adc_buffer[BUFFER_SIZE];
+extern uint8_t graph_ready;
 
 uint32_t TIM6_init();
 uint32_t TIM2_init();
 uint32_t initialize_gpio();
+uint32_t extract_samples(uint16_t *extracted_data);
+
 
 #endif /* PMI_H */
