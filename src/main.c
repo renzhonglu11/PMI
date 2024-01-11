@@ -8,13 +8,20 @@ int main(void)
     clocks_init_pmi();
     uart_init_nucusb(115200);
 
-    TIM6_init();
-    initialize_gpio();
 
+    adc_init();
+
+    TIM6_init();
+    TIM2_init();
+    initialize_gpio();
+    
+   
 
     while(1)
     {
         /* Call your routines here */
+        
+        TIM2->CR1 |= TIM_CR1_CEN;
         
         
     }
