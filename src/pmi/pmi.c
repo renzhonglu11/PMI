@@ -88,8 +88,7 @@ void TIM2_IRQHandler(void)
       // Now, adc_buffer contains 120 samples before and after the trigger
       // Process the buffer here or signal that it's ready to be processed
       graph_ready = 1;
-      // uart_tx_str("ready...");
-      // uart_tx_str("\n");
+
     }
 
     // TIM2->CR1 &= ~TIM_CR1_CEN;

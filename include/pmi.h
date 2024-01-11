@@ -7,6 +7,9 @@
 #include "adc.h"
 #include "ili9341.h"
 #include <systick.h>
+#include <graph_utils.h>
+#include <pmi_string.h>
+#include <stdio.h>
 
 #define BUFFER_SIZE 240
 #define PRE_TRIGGER_COUNT 120
