@@ -2,9 +2,10 @@
 
 int current_index = 0;
 int trigger_index = -1;
-uint16_t adc_threshold = 2048; // Mid-range threshold for a 12-bit ADC
+uint16_t adc_threshold = 2048;          // Mid-range threshold for a 12-bit ADC
 uint16_t previous_adc_value = 4095;
 enum PMI_BOOL_E edge_detected = FALSE;
+enum PMI_BOOL_E first_reading_taken = FALSE;
 
 
 uint32_t extract_samples(uint16_t *extracted_data)
@@ -25,6 +26,9 @@ uint32_t extract_samples(uint16_t *extracted_data)
       break; // Stop when we reach the end index
     }
   }
+
+
+
 
   return RC_SUCC;
 }
@@ -52,6 +56,8 @@ void TIM6_IRQHandler(void)
 
 void TIM2_IRQHandler(void)
 {
+  // TODO: take a deep look at the circular buffer
+
   if (TIM2->SR & TIM_SR_UIF)
   {
 
@@ -66,7 +72,18 @@ void TIM2_IRQHandler(void)
 
     ADC1->CR |= ADC_CR_ADSTART; // start conversion
 
-    uint16_t adc_val = (uint16_t)(ADC1->DR & 0xFFFF);
+    // Wait for end of conversion (EOC)
+    while (!(ADC1->ISR & ADC_ISR_EOC));
+    
+
+    uint16_t adc_val = (uint16_t)(ADC1->DR & 0xFFFF);  // get ADC value
+
+    if (!first_reading_taken) 
+    {
+        first_reading_taken = TRUE;
+        previous_adc_value = adc_val;
+        return;
+    } 
 
     // uart_tx_int(adc_val);
     // uart_tx_str("\n");
@@ -84,10 +101,13 @@ void TIM2_IRQHandler(void)
     // Check if we have captured enough post-trigger samples
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
+      // reset all the things here
       edge_detected = FALSE;
       // Now, adc_buffer contains 120 samples before and after the trigger
       // Process the buffer here or signal that it's ready to be processed
       graph_ready = 1;
+      current_index = 0;                // clear the buffer
+      first_reading_taken = FALSE;  
 
     }
 
@@ -165,4 +185,7 @@ uint32_t initialize_gpio()
   GPIOC->MODER |= GPIO_MODER_MODE8_0;  // Set PC5 as output
 
   // GPIOC->MODER |= GPIO_MODER_MODE5;
+
+
+  // @renzhonglu11 TODO:set PC6
 }

@@ -15,8 +15,27 @@ uint32_t draw_graph(uint16_t* buffer, int buffer_size, uint16_t color)
 
     // Determine scaling factors based on the display size and ADC range
     uint16_t x_scale = display_info.width / buffer_size;
+    // uint16_t x_scale = display_info.width / 120;
     // uint16_t y_scale = 62 / 4096;  // Assuming 12-bit ADC
     float y_scale = 62.0 / 4096.0; // Now y_scale is a floating-point number
+
+    // int start_index = triger_index;
+    // int end_index = (triger_index + 120) % buffer_size;
+
+    // for (int i = 0; i < buffer_size; i++)
+    // {
+    //   if (i > 120)
+    //   {
+    //     break; // Stop when we reach the end index
+    //   }
+    //   // buffer[start_index];
+    //   int16_t x = i * x_scale;
+    //   int16_t y = 140 - (int16_t)(buffer[start_index]*y_scale);   // set 140 as the offset first
+    //   ili9341_draw_thick_line_horizontal(x, y, color, 2);
+    //   start_index = (start_index + 1) % buffer_size;
+
+    // }
+
 
 
     // Plot the ADC values
@@ -33,7 +52,9 @@ uint32_t draw_graph(uint16_t* buffer, int buffer_size, uint16_t color)
     // ili9341_line_draw(trigger_x, 0, trigger_x, display_info.height, ILI9341_COLOR_RED);
 
     // Optionally, mark the t=RC point if calculated
-    systick_delay_ms(300);
+    
+    
+    // systick_delay_ms(300);
     return RC_SUCC;
 }
 

@@ -49,8 +49,9 @@ uint32_t adc_init()
     // ADC1->CFGR1 |= ADC_CFGR1_EXTEN_1; // Set EXTEN to 10 for trigger detection on falling edge
     // ADC1->CFGR1 |= ADC_CFGR1_EXTSEL_0; // Select the external trigger (e.g., TIM2_TRGO, modify as needed)
 
-    // select clock mode
-    ADC1->CFGR2 &= (~ADC_CFGR2_CKMODE); // clear mode bits 
+    // select clock mode as 00
+    // Since ADC is triggered by timer here
+    ADC1->CFGR2 &= (~ADC_CFGR2_CKMODE); 
     
     // select channel
     ADC1->CHSELR |= ADC_CHSELR_CHSEL15; // select channel 5 (PC5)
@@ -65,12 +66,15 @@ uint32_t adc_init()
 
 
     // conversion time: sampling time + 12.5 ADC clock cycles
-    // 239.5 + 12.5 = 252 ADC clock cycles
-    // 252 /16mhz = 15.75 us
+    // 160.5 + 12.5 = 173 ADC clock cycles
+    // 173 /16mhz = 10.81 us
     
 
-    ADC1->SMPR |= ADC_SMPR_SMP_0|ADC_SMPR_SMP_1|ADC_SMPR_SMP_2; // set sampling time to 239.5 ADC clock cycles
+    ADC1->SMPR |= ADC_SMPR_SMP_0|ADC_SMPR_SMP_1|ADC_SMPR_SMP_2; // set sampling time to 160.5 ADC clock cycles
     
+
+    // set GPIO pin PC5 to analog mode
+    GPIOC->MODER |= GPIO_MODER_MODE5; // set to analog mode
 
 
     ADC1->CR |= ADC_CR_ADEN; // enable ADC
@@ -80,7 +84,7 @@ uint32_t adc_init()
     
       
     
-
+    
 
     return RC_SUCC;
 

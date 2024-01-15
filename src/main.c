@@ -16,6 +16,7 @@ void get_metrics(float *averageValue, float *peakToPeakValue, float *timeSpan, f
 
 void displayValues(uint8_t zoomLevel) 
 {
+    // TODO: display all the values on the LCD
 
     float averageValue;
     float peakToPeakValue;
@@ -89,14 +90,30 @@ int main(void)
       uint16_t extracted_data[BUFFER_SIZE];
       extract_samples(extracted_data);
 
+    //   uint8_t trigger_index = 0;
+
+    //   for (int i = 0; i < BUFFER_SIZE; i++) {
+    //   if (i > 0 && extracted_data[i] < 2048 && extracted_data[i - 1] >= 2048) {
+    //       // Falling edge detected at index i
+    //       trigger_index = i;
+    //       break;
+    //   }
+    // }
+
+
+
+
       // Draw the graph on the display
+      // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLUE, trigger_index);
       draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLUE);
 
       graph_ready = 0;
+      displayValues(1);
 
       
+      systick_delay_ms(2000);
+
       draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_WHITE);
-      displayValues(1);
     }
   }
 }
