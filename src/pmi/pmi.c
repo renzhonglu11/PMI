@@ -5,13 +5,25 @@ int trigger_index = -1;
 uint16_t adc_threshold = 2048;          // Mid-range threshold for a 12-bit ADC
 uint16_t previous_adc_value = 4095;
 enum PMI_BOOL_E edge_detected = FALSE;
-enum PMI_BOOL_E first_reading_taken = FALSE;
+enum PMI_BOOL_E first_reading_taken = TRUE;
 
+uint8_t data_ready = 0;
 
 uint32_t extract_samples(uint16_t *extracted_data)
 {
-  int start_index = (trigger_index - PRE_TRIGGER_COUNT + BUFFER_SIZE) % BUFFER_SIZE;
-  int end_index = (trigger_index + POST_TRIGGER_COUNT) % BUFFER_SIZE;
+  int start_index = (trigger_index + POST_TRIGGER_COUNT) % BUFFER_SIZE;
+
+ 
+ 
+  int end_index = (trigger_index - PRE_TRIGGER_COUNT + BUFFER_SIZE) % BUFFER_SIZE;
+  
+  
+  uart_tx_str("start: ");
+  uart_tx_int(start_index);
+  uart_tx_str("\n");
+  uart_tx_str("end: ");
+  uart_tx_int(end_index);
+  uart_tx_str("\n");
 
   // uint16_t extracted_data[BUFFER_SIZE]; // Array to hold the extracted data
   int extracted_index = 0;
@@ -66,8 +78,7 @@ void TIM2_IRQHandler(void)
     if (ADC1->CR & ADC_CR_ADSTART)
     {
       ADC1->CR |= ADC_CR_ADSTP; // stop conversion
-      while (ADC1->CR & ADC_CR_ADSTP)
-        ;
+      while (ADC1->CR & ADC_CR_ADSTP);
     }
 
     ADC1->CR |= ADC_CR_ADSTART; // start conversion
@@ -75,24 +86,43 @@ void TIM2_IRQHandler(void)
     // Wait for end of conversion (EOC)
     while (!(ADC1->ISR & ADC_ISR_EOC));
     
+    ADC1->ISR |= ADC_ISR_EOC;    // clear EOC bit
+
 
     uint16_t adc_val = (uint16_t)(ADC1->DR & 0xFFFF);  // get ADC value
 
-    if (!first_reading_taken) 
+    
+
+    if(first_reading_taken)
     {
-        first_reading_taken = TRUE;
-        previous_adc_value = adc_val;
-        return;
-    } 
+      previous_adc_value = adc_val;
+      first_reading_taken = FALSE;
+      return;
+    }
+
+
 
     // uart_tx_int(adc_val);
     // uart_tx_str("\n");
 
-    if (edge_detected == FALSE && previous_adc_value >= adc_threshold && adc_val < adc_threshold)
+    if(data_ready)
+    {
+      return;
+    }
+
+    
+
+
+
+   
+
+    if (edge_detected == FALSE && (previous_adc_value >= adc_threshold) && (adc_val < adc_threshold))
     {
       edge_detected = TRUE;
       trigger_index = current_index;
     }
+
+
 
     adc_buffer[current_index] = adc_val;               // Store in buffer
     previous_adc_value = adc_val;                      // Update for next comparison
@@ -101,13 +131,16 @@ void TIM2_IRQHandler(void)
     // Check if we have captured enough post-trigger samples
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
+      
       // reset all the things here
       edge_detected = FALSE;
       // Now, adc_buffer contains 120 samples before and after the trigger
       // Process the buffer here or signal that it's ready to be processed
       graph_ready = 1;
-      current_index = 0;                // clear the buffer
+      // current_index = 0;                // clear the buffer
       first_reading_taken = FALSE;  
+      
+      data_ready = 1;
 
     }
 
@@ -126,7 +159,7 @@ uint32_t TIM2_init()
   /**
    * 1/1mhz = 1us (microsecond)
    * 16mhz/16 = 1mhz, easy prescaler
-   * t = 1/1mhz*400 = 1ms, so ARR should be 400
+   * t = 1/1mhz*400 = 400 us, so ARR should be 400
    */
   // TIM2->PSC = 16 - 1;
   TIM2->PSC = 16; // Set prescaler to 16

@@ -16,7 +16,9 @@
 #define POST_TRIGGER_COUNT 120
 
 uint16_t adc_buffer[BUFFER_SIZE];
+
 extern uint8_t graph_ready;
+extern uint8_t data_ready;
 
 uint32_t TIM6_init();
 uint32_t TIM2_init();

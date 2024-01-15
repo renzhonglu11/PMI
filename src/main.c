@@ -87,8 +87,12 @@ int main(void)
     {
       // draw the graph
       // Extract data from the circular buffer
+  
       uint16_t extracted_data[BUFFER_SIZE];
       extract_samples(extracted_data);
+
+      
+      
 
     //   uint8_t trigger_index = 0;
 
@@ -105,15 +109,18 @@ int main(void)
 
       // Draw the graph on the display
       // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLUE, trigger_index);
+
       draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLUE);
 
-      graph_ready = 0;
       displayValues(1);
 
       
       systick_delay_ms(2000);
 
-      draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_WHITE);
+      // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_WHITE);
+
+      graph_ready = 0;
+      data_ready = 0;
     }
   }
 }
