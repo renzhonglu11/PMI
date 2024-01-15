@@ -9,13 +9,21 @@ enum PMI_BOOL_E first_reading_taken = TRUE;
 
 uint8_t data_ready = 0;
 
+
+
 uint32_t extract_samples(uint16_t *extracted_data)
 {
-  int start_index = (trigger_index + POST_TRIGGER_COUNT) % BUFFER_SIZE;
+  if(data_ready)
+  {
+    // we get the data, now lock this function
+    return RC_SUCC;
+  }
+  
+  uint8_t start_index = (trigger_index - PRE_TRIGGER_COUNT + BUFFER_SIZE) % BUFFER_SIZE;
 
  
  
-  int end_index = (trigger_index - PRE_TRIGGER_COUNT + BUFFER_SIZE) % BUFFER_SIZE;
+  uint8_t end_index = (trigger_index + POST_TRIGGER_COUNT) % BUFFER_SIZE;
   
   
   uart_tx_str("start: ");
@@ -105,16 +113,12 @@ void TIM2_IRQHandler(void)
     // uart_tx_int(adc_val);
     // uart_tx_str("\n");
 
-    if(data_ready)
-    {
-      return;
-    }
+    // if(data_ready)
+    // {
+    //   return;
+    // }
 
-    
-
-
-
-   
+  
 
     if (edge_detected == FALSE && (previous_adc_value >= adc_threshold) && (adc_val < adc_threshold))
     {
@@ -136,11 +140,12 @@ void TIM2_IRQHandler(void)
       edge_detected = FALSE;
       // Now, adc_buffer contains 120 samples before and after the trigger
       // Process the buffer here or signal that it's ready to be processed
-      graph_ready = 1;
-      // current_index = 0;                // clear the buffer
+      extract_samples(extracted_data);     // we get the current finish cirular buffer
+      graph_ready = 1;                     // inform main to draw the graph
+      
       first_reading_taken = FALSE;  
       
-      data_ready = 1;
+
 
     }
 

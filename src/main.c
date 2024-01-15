@@ -88,9 +88,9 @@ int main(void)
       // draw the graph
       // Extract data from the circular buffer
   
-      uint16_t extracted_data[BUFFER_SIZE];
-      extract_samples(extracted_data);
-
+      // uint16_t extracted_data[BUFFER_SIZE];
+      // extract_samples(extracted_data);
+      data_ready = 1;     // lock extract_samples function
       
       
 
@@ -120,7 +120,7 @@ int main(void)
       // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_WHITE);
 
       graph_ready = 0;
-      data_ready = 0;
+      data_ready = 0;   // unlock extract_samples function
     }
   }
 }
