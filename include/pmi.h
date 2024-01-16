@@ -11,6 +11,11 @@
 #include <pmi_string.h>
 #include <stdio.h>
 
+
+extern const float DIVISOR_MV;
+extern uint8_t rc_range;
+extern uint32_t p2p_val;
+
 #define BUFFER_SIZE 240
 #define PRE_TRIGGER_COUNT 120
 #define POST_TRIGGER_COUNT 120

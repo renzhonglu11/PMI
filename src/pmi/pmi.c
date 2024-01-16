@@ -1,5 +1,6 @@
 #include "pmi.h"
 
+
 int current_index = 0;
 int trigger_index = -1;
 uint16_t adc_threshold = 2048;          // Mid-range threshold for a 12-bit ADC
@@ -25,14 +26,6 @@ uint32_t extract_samples(uint16_t *extracted_data)
  
   uint8_t end_index = (trigger_index + POST_TRIGGER_COUNT) % BUFFER_SIZE;
   
-  
-  uart_tx_str("start: ");
-  uart_tx_int(start_index);
-  uart_tx_str("\n");
-  uart_tx_str("end: ");
-  uart_tx_int(end_index);
-  uart_tx_str("\n");
-
   // uint16_t extracted_data[BUFFER_SIZE]; // Array to hold the extracted data
   int extracted_index = 0;
 
@@ -108,17 +101,6 @@ void TIM2_IRQHandler(void)
       return;
     }
 
-
-
-    // uart_tx_int(adc_val);
-    // uart_tx_str("\n");
-
-    // if(data_ready)
-    // {
-    //   return;
-    // }
-
-  
 
     if (edge_detected == FALSE && (previous_adc_value >= adc_threshold) && (adc_val < adc_threshold))
     {
@@ -226,4 +208,6 @@ uint32_t initialize_gpio()
 
 
   // @renzhonglu11 TODO:set PC6
+  GPIOC->MODER &= ~(GPIO_MODER_MODE6); // Clear PC6 mode
+  GPIOC->MODER |= GPIO_MODER_MODE6_0;  // Set PC6 as output
 }
