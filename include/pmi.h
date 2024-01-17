@@ -5,7 +5,6 @@
 #include "pmi_stddefs.h"
 #include "uart.h"
 #include "adc.h"
-#include "ili9341.h"
 #include <systick.h>
 #include <graph_utils.h>
 #include <pmi_string.h>
@@ -15,6 +14,8 @@
 extern const float DIVISOR_MV;
 extern uint8_t rc_range;
 extern uint32_t p2p_val;
+extern uint8_t zoom_lvl;
+
 
 #define BUFFER_SIZE 240
 #define PRE_TRIGGER_COUNT 120

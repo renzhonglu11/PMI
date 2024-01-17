@@ -146,31 +146,31 @@ int32_t uart_rx_str(char *buf, uint16_t size, uint16_t *len)
 }
 
 
-int32_t uart_rx_uint(uint16_t *val)
-{   
+// int32_t uart_rx_uint(uint16_t *val)
+// {   
 
-    char input_txt;
-    uint8_t i = 0;
-    *val = 0;
+//     char input_txt;
+//     uint8_t i = 0;
+//     *val = 0;
 
-    while(1){
-      if(input_txt == '\n'){
-        break;
-      }
+//     while(1){
+//       if(input_txt == '\n'){
+//         break;
+//       }
 
-      input_txt = uart_rx_char();
+//       input_txt = uart_rx_char();
         
-      uint16_t input_int = atoi(&input_txt);
-      for(int j = 0;j<i;j++)
-      {
-          input_int = input_int * 10;
-      }
+//       uint16_t input_int = atoi(&input_txt);
+//       for(int j = 0;j<i;j++)
+//       {
+//           input_int = input_int * 10;
+//       }
 
-      *val = input_int + *val;
-      i++;
-    }
+//       *val = input_int + *val;
+//       i++;
+//     }
 
 
-    return *val;
+//     return *val;
     
-}
+// }
