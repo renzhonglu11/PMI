@@ -7,7 +7,7 @@ const float DIVISOR_MV = 4.095;
 uint8_t graph_ready = 0;
 uint8_t rc_range = 0;
 uint32_t p2p_val = 0;
-uint8_t zoom_lvl = 1;
+uint8_t volatile zoom_lvl = 1;
 
 int main(void)
 {
@@ -22,6 +22,7 @@ int main(void)
 
   TIM6_init();
   TIM2_init();
+  TIM21_init();
   initialize_gpio();
 
   while (1)

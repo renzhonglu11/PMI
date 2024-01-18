@@ -8,6 +8,8 @@ enum PMI_BOOL_E edge_detected = FALSE;
 enum PMI_BOOL_E first_reading_taken = TRUE;
 
 uint8_t data_ready = 0;
+volatile uint8_t debounce_in_progress = 0;
+volatile uint8_t pb2_pressed = 0;
 
 uint32_t initial_interrupt(void);
 uint32_t config_button(void);
@@ -45,8 +47,6 @@ void TIM6_IRQHandler(void)
 {
   if (TIM6->SR & TIM_SR_UIF)
   {
-    // Check update interrupt flag
-    TIM6->SR &= ~TIM_SR_UIF; // Clear update interrupt flag
 
     // GPIOC->ODR ^= GPIO_ODR_OD4; // Toggle PC4
     if (GPIOC->ODR & GPIO_ODR_OD4)
@@ -59,6 +59,9 @@ void TIM6_IRQHandler(void)
       GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
       GPIOC->BSRR = GPIO_BSRR_BS_8; // Set PC8 (set it to 1) if it is currently reset
     }
+
+    // Check update interrupt flag
+    TIM6->SR &= ~TIM_SR_UIF; // Clear update interrupt flag
   }
 }
 
@@ -181,28 +184,107 @@ uint32_t TIM6_init()
   return RC_SUCC;
 }
 
+/**
+ * @brief Interrupt handler for TIM21.
+ *
+ * This function is called when the update interrupt flag of TIM21 is set.
+ * It clears the interrupt flag, stops the timer, and processes button actions
+ * based on the state of PB1 and PB2 buttons. It also updates the zoom level
+ * based on the button actions.
+ */
+void TIM21_IRQHandler(void)
+{
+  // Code implementation
+}
+void TIM21_IRQHandler(void)
+{
+  if (TIM21->SR & TIM_SR_UIF)
+  {
+    // Clear update interrupt flag
+    TIM21->SR &= ~TIM_SR_UIF;
+
+    // Stop the timer
+    TIM21->CR1 &= ~TIM_CR1_CEN;
+
+    // Process button action now that debouncing is complete
+    // Process button action for PB1
+    if (!(GPIOB->IDR & GPIO_IDR_ID1))
+    {
+      if (zoom_lvl <= 1)
+      {
+        zoom_lvl = 1;
+      }
+      else
+      {
+        zoom_lvl -= 1; // Decrease zoom level
+      }
+
+    }
+
+    // Process button action for PB2
+    if (!(GPIOB->IDR & GPIO_IDR_ID2))
+    {
+      if (zoom_lvl >= 5)
+      {
+        zoom_lvl = 5;
+      }
+      else
+      {
+        zoom_lvl += 1; // Increase zoom level
+      }
+
+    }
+
+    // Reset debounce flag
+    debounce_in_progress = 0;
+  }
+}
+
+
+uint32_t TIM21_init()
+{
+  RCC->APB2ENR |= RCC_APB2ENR_TIM21EN; // Enable Timer 2 clock
+
+  // ensure timer2 is in initial state
+  RCC->APB2RSTR |= RCC_APB2RSTR_TIM21RST;
+  RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM21RST;
+
+  /**
+   * 1s = 1000ms, 1/1hz = 1s, 1/1kmhz = 1ms
+   * 16mhz/16000 = 1khz, easy prescaler
+   * t = 1/1khz*35 = 35ms, so ARR should be 35
+   */
+
+  TIM21->PSC = 16000 - 1;      // Set prescaler to 16000
+  TIM21->ARR = 35 - 1;         // Set auto-reload to 60 for 60ms
+  TIM21->DIER |= TIM_DIER_UIE; // Enable update interrupt
+
+  NVIC_ClearPendingIRQ(TIM21_IRQn);
+  NVIC_SetPriority(TIM21_IRQn, 1);
+  NVIC_EnableIRQ(TIM21_IRQn);
+
+
+
+  return RC_SUCC;
+}
+
 void EXTI2_3_IRQHandler()
 {
   // PB2 for SW1
-  // uint8_t gpio = 0x00;
+  if ((EXTI->PR & EXTI_PR_PIF2)) // pending bit of EXTI line 2 is set
+  {
 
-  if (EXTI->PR & EXTI_PR_PIF2) // pending bit of EXTI line 2 is set
-  { 
-    
-    // systick_delay_ms(10);
-    // uint8_t state = READ_BIT(GPIOB->IDR, GPIO_IDR_ID2);
-    // if (state != 0)
-    // {
-      if (zoom_lvl > 5)
-      {
-        zoom_lvl = 5;
-        return;
-      }
-      zoom_lvl += 1;
-    // }
-    EXTI->PR = EXTI_PR_PIF2; // write one to corresponding pending bit to clear pending bit
-    // TIM2->CR1 |= TIM_CR1_CEN;
+    if(!debounce_in_progress)
+    {
+    pb2_pressed = 1;
+    // Start debounce timer
+    debounce_in_progress = 1; // debounce in progress
+    TIM21->CNT = 0;           // Reset the timer count
+    TIM21->CR1 |= TIM_CR1_CEN;
+
+    }
   }
+  EXTI->PR = EXTI_PR_PIF2; // write one to corresponding pending bit to clear pending bit
 }
 
 void EXTI0_1_IRQHandler(void)
@@ -210,24 +292,19 @@ void EXTI0_1_IRQHandler(void)
   // PB1 for SW2
   // TODO: implment interrupt handler for SW2
 
-  if (EXTI->PR & EXTI_PR_PIF1)
+  if ((EXTI->PR & EXTI_PR_PIF1))
   {
-    // TIM2->CR1 &= (~TIM_CR1_CEN);
-    // systick_delay_ms(10);
-    // uint8_t state = READ_BIT(GPIOB->IDR, GPIO_IDR_ID1);
 
-    // if (state != 0)
-    // {
-      if (zoom_lvl <= 0)
-      {
-        zoom_lvl = 1;
-        return;
-      }
-      zoom_lvl += -1;
-    // }
+    if(!debounce_in_progress)
+    {
+    // Start debounce timer
+    debounce_in_progress = 1; // debounce in progress
+    TIM21->CNT = 0;           // Reset the timer count
+    TIM21->CR1 |= TIM_CR1_CEN;
+
+    }
   }
   EXTI->PR = EXTI_PR_PIF1;
-  // TIM2->CR1 |= TIM_CR1_CEN;
 }
 
 uint32_t initialize_gpio()
@@ -253,22 +330,18 @@ uint32_t initialize_gpio()
 uint32_t config_button(void)
 {
   //  enable GPIOB clock
-  RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
+  RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
 
   // set input mode
   GPIOB->MODER &= ~(GPIO_MODER_MODE2); // PB2 for SW1
   GPIOB->MODER &= ~(GPIO_MODER_MODE1); // PB1 for SW2
 
-  // return 0 if GPIOB->MODER not set correctly
-  // if ((GPIOB->MODER & GPIO_MODER_MODE2) != 0 || (GPIOB->MODER & GPIO_MODER_MODE3)!=0)
-  // {
-  //   return RC_ERR;
-  // }
 
   initial_interrupt();
 
   return RC_SUCC;
 }
+
 
 uint32_t initial_interrupt(void)
 {
@@ -287,7 +360,7 @@ uint32_t initial_interrupt(void)
   NVIC_ClearPendingIRQ(EXTI0_1_IRQn); // PB1 in EXTI1
   NVIC_ClearPendingIRQ(EXTI2_3_IRQn); // PB2 in EXTI2
   NVIC_SetPriority(EXTI0_1_IRQn, 3);
-  NVIC_SetPriority(EXTI2_3_IRQn, 4);
+  NVIC_SetPriority(EXTI2_3_IRQn, 3);
   NVIC_EnableIRQ(EXTI0_1_IRQn);
   NVIC_EnableIRQ(EXTI2_3_IRQn);
 

@@ -14,7 +14,7 @@
 extern const float DIVISOR_MV;
 extern uint8_t rc_range;
 extern uint32_t p2p_val;
-extern uint8_t zoom_lvl;
+extern volatile uint8_t zoom_lvl;
 
 
 #define BUFFER_SIZE 240
@@ -31,6 +31,7 @@ extern uint8_t data_ready;
 
 uint32_t TIM6_init();
 uint32_t TIM2_init();
+uint32_t TIM21_init();
 uint32_t initialize_gpio();
 uint32_t extract_samples(uint16_t *extracted_data);
 
