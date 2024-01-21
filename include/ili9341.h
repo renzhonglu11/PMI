@@ -177,4 +177,6 @@ uint32_t ili9341_test(void);
  */
 void ili9341_enterthematrix(void);
 
+// uint32_t calculate_string_width(const char* str); 
+
 #endif /* ILI9341_H */

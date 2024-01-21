@@ -38,7 +38,7 @@ int main(void)
 
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
       displayValues(zoom_lvl);
-      systick_delay_ms(1600);
+      systick_delay_ms(1100);
 
       // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLACK);
 

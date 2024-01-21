@@ -4,6 +4,9 @@
 #include "graph_utils.h"
 #include "ili9341.h"
 #include "pmi.h"
+#include <string.h>
+
+
 
 
 #define CURVE_COLOR         ILI9341_COLOR_WHITE

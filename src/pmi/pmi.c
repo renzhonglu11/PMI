@@ -13,6 +13,8 @@ volatile uint8_t pb2_pressed = 0;
 
 uint32_t initial_interrupt(void);
 uint32_t config_button(void);
+uint32_t reset_TIM2_zoom_level();
+
 
 uint32_t extract_samples(uint16_t *extracted_data)
 {
@@ -77,8 +79,7 @@ void TIM2_IRQHandler(void)
     if (ADC1->CR & ADC_CR_ADSTART)
     {
       ADC1->CR |= ADC_CR_ADSTP; // stop conversion
-      while (ADC1->CR & ADC_CR_ADSTP)
-        ;
+      while (ADC1->CR & ADC_CR_ADSTP);
     }
 
     ADC1->CR |= ADC_CR_ADSTART; // start conversion
@@ -144,6 +145,9 @@ uint32_t TIM2_init()
   // TIM2->ARR = 6400-1;
   TIM2->ARR = 400 - 1; // Set auto-reload to 400
 
+  TIM2->CR1 |= TIM_CR1_ARPE; // Enable auto-reload preload
+
+
   TIM2->DIER |= TIM_DIER_UIE; // Enable update interrupt
 
   NVIC_ClearPendingIRQ(TIM2_IRQn);
@@ -194,10 +198,6 @@ uint32_t TIM6_init()
  */
 void TIM21_IRQHandler(void)
 {
-  // Code implementation
-}
-void TIM21_IRQHandler(void)
-{
   if (TIM21->SR & TIM_SR_UIF)
   {
     // Clear update interrupt flag
@@ -217,6 +217,7 @@ void TIM21_IRQHandler(void)
       else
       {
         zoom_lvl -= 1; // Decrease zoom level
+        reset_TIM2_zoom_level();
       }
 
     }
@@ -231,6 +232,7 @@ void TIM21_IRQHandler(void)
       else
       {
         zoom_lvl += 1; // Increase zoom level
+        reset_TIM2_zoom_level();
       }
 
     }
@@ -267,6 +269,28 @@ uint32_t TIM21_init()
 
   return RC_SUCC;
 }
+
+uint8_t power_of_2(uint8_t exponent)
+{
+    uint8_t r = 1;
+
+    for (uint8_t i = 1; i < exponent; i++)
+    {
+        r *= 2;
+    }
+
+    return r;
+}
+
+uint32_t reset_TIM2_zoom_level()
+{
+  const uint32_t ARR_DEFAULT = 400;
+
+  TIM2->ARR = ARR_DEFAULT / power_of_2(zoom_lvl) - 1;
+
+  return RC_SUCC;
+}
+
 
 void EXTI2_3_IRQHandler()
 {

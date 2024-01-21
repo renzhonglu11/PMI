@@ -808,3 +808,17 @@ int32_t ili9341_init(uint8_t rotation)
 
     return RC_SUCC;
 }
+
+
+// uint32_t calculate_string_width(const char* str) 
+// {
+//     int width = 0;
+//     while (*str) {
+//         char c = *str++;
+//         if (c >= font->first && c <= font->last) {
+//             GFXglyph *glyph = &font->glyph[c - font->first];
+//             width += glyph->xAdvance;
+//         }
+//     }
+//     return width;
+// }
