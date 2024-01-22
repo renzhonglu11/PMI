@@ -56,6 +56,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     if (i > 0 && !find_flag && !rc_flag)
     {
       uint16_t target_val = (y_max * 368) / 1000; // easy numeric approximation
+      
       if (buffer[i] <= target_val)
       {
         rc_flag = 1;

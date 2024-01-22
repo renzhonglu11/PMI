@@ -20,7 +20,7 @@ int main(void)
 
   adc_init();
 
-  TIM6_init();
+  // TIM6_init();
   TIM2_init();
   TIM21_init();
   initialize_gpio();
@@ -37,7 +37,7 @@ int main(void)
 
 
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
-      displayValues(zoom_lvl);
+      // displayValues(zoom_lvl);
       systick_delay_ms(1100);
 
       // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLACK);
