@@ -1,15 +1,18 @@
 #include "common.h"
 
 
-void get_metrics(uint32_t *average_voltage, uint32_t *rc_time_microseconds, float *timeSpan, uint32_t *capacitanceValue)
+void get_metrics(uint32_t *average_voltage, float *time_period, float *timeSpan, float *capacitanceValue)
 {
 
   *timeSpan = (float)(BUFFER_SIZE * 400 / 1000);
-
+  
   uint32_t sampling_time_microseconds = 400; // 400 microseconds
-  *rc_time_microseconds = rc_range * sampling_time_microseconds;
-  *capacitanceValue = *rc_time_microseconds;
+  
+  *time_period = final_time_period * sampling_time_microseconds;
 
+  // *capacitanceValue = *time_period;
+  *capacitanceValue = (float)(*time_period) / 2.197224577;         // nanofarads
+  
   // sample frequence = 400us
   // 1/400us = 2500Hz, sample time = 1/2500 = 0.4ms
 

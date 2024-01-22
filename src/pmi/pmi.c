@@ -96,40 +96,23 @@ void TIM2_IRQHandler(void)
     {
       previous_adc_value = adc_val;
       first_reading_taken = FALSE;
-      if (GPIOC->ODR & GPIO_ODR_OD4)
-      {
-        GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) if it is currently set
-      }
-      else
-      {
-        GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
-      }
       return;
     }
 
-
-    if ((adc_val > 1024 && previous_adc_value < 1024) || (adc_val < 1024 && previous_adc_value > 1024))
+    if (adc_val <= 1024) // 4095/4 = 1023.75
     {
-      if (GPIOC->ODR & GPIO_ODR_OD4)
-      {
-        GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) if it is currently set
-      }
-      else
-      {
-        GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
-      }
+
+      GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
+      GPIOC->BSRR = GPIO_BSRR_BS_8;
+      
+
+
     }
-
-    if ((adc_val > 3072 && previous_adc_value < 3072) || (adc_val < 3072 && previous_adc_value > 3072))
+    else if (adc_val >= 3071) // 4095*3/4 = 3071.25
     {
-      if (GPIOC->ODR & GPIO_ODR_OD4)
-      {
-        GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) if it is currently set
-      }
-      else
-      {
-        GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
-      }
+      GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) if it is currently set
+      
+      GPIOC->BSRR = GPIO_BSRR_BR_8;
     }
 
     if (edge_detected == FALSE && (previous_adc_value >= adc_threshold) && (adc_val < adc_threshold))
@@ -159,7 +142,6 @@ void TIM2_IRQHandler(void)
     // TIM2->CR1 &= ~TIM_CR1_CEN;
   }
 }
-
 
 /**
  * @brief Interrupt handler for TIM21.
@@ -212,7 +194,6 @@ void TIM21_IRQHandler(void)
     debounce_in_progress = 0;
   }
 }
-
 
 uint8_t power_of_2(uint8_t exponent)
 {

@@ -8,6 +8,7 @@ extern const float DIVISOR_MV;
 extern uint8_t rc_range;
 extern uint32_t p2p_val;
 extern volatile uint8_t zoom_lvl;
+extern uint16_t final_time_period;
 
 
 #define BUFFER_SIZE 240

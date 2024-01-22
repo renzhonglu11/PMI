@@ -8,6 +8,7 @@ uint8_t graph_ready = 0;
 uint8_t rc_range = 0;
 uint32_t p2p_val = 0;
 uint8_t volatile zoom_lvl = 1;
+uint16_t final_time_period = 0;
 
 int main(void)
 {
@@ -20,7 +21,7 @@ int main(void)
 
   adc_init();
 
-  // TIM6_init();
+  
   TIM2_init();
   TIM21_init();
   initialize_gpio();
@@ -28,7 +29,7 @@ int main(void)
   while (1)
   {
     
-    systick_delay_ms(300);
+    // systick_delay_ms(300);
 
     if (graph_ready)
     {
@@ -37,15 +38,16 @@ int main(void)
 
 
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
-      // displayValues(zoom_lvl);
+      displayValues(zoom_lvl);
       systick_delay_ms(1100);
 
-      // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLACK);
 
 
       GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
       graph_ready = 0;
       data_ready = 0; // unlock extract_samples function
     }
+
+    systick_delay_ms(300);
   }
 }

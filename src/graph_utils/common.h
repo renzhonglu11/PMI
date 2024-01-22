@@ -13,7 +13,7 @@
 #define TXT_COLOR           ILI9341_COLOR_WHITE
 
 
-void get_metrics(uint32_t *average_voltage, uint32_t *rc_time_microseconds, float *timeSpan, uint32_t *capacitanceValue);
+void get_metrics(uint32_t *average_voltage, float *time_period, float *timeSpan, float *capacitanceValue);
 
 
 

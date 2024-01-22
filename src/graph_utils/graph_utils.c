@@ -25,12 +25,15 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
   // uint16_t y_scale = 62 / 4096;  // Assuming 12-bit ADC
   float y_scale = 64.0 / 4096.0; // Now y_scale is a floating-point number
 
-  uint16_t initial_val = 0;
+  int16_t last_rising_edge = -1;
+  uint16_t total_time_period = 0;
+  uint8_t time_period_counter = 0;
+
   uint16_t y_max = 0;
   uint8_t rc_flag = 0;
   int8_t find_flag = 0;
   uint8_t x_max = 0;
-  uint16_t y_min = 999;
+  uint16_t y_min = 4095;
 
   // Plot the ADC values
   for (uint8_t i = 0; i < buffer_size; i++)
@@ -38,16 +41,21 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
 
     int16_t x = i * x_scale;
     int16_t y = 140 - (int16_t)(buffer[i] * y_scale); // set 140 as the offset first
-    if (y_min > buffer[i])
+    if (y_min >= buffer[i])
     {
       y_min = buffer[i];
+    }
+
+    if (y_max <= buffer[i])
+    {
+      y_max = buffer[i];
     }
 
     // charging
     if (i > 0 && buffer[i] > buffer[i - 1])
     {
-      initial_val = i;
-      y_max = buffer[i];
+      
+      // y_max = buffer[i];
       x_max = i;
       find_flag = 1;
     }
@@ -61,19 +69,35 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       {
         rc_flag = 1;
         rc_range = i - x_max;
-        ili9341_line_draw(x, 140, x, 140 - 64, line_color);
+        // ili9341_line_draw(x, 140, x, 140 - 64, line_color);
       }
     }
 
-    // ili9341_pixel_set(x, y, ILI9341_COLOR_BLUE);
+    if(buffer[i] >= 2048 && buffer[i-1] < 2048 && i>5)
+    { 
+      int16_t x_tmp = i * x_scale;
+      ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
+
+      if(last_rising_edge!=-1)
+      {
+        uint16_t cur_time = (i-last_rising_edge);
+        total_time_period += cur_time;
+      }
+
+      last_rising_edge = i;
+      time_period_counter++;
+    }
+
+
+   
     ili9341_draw_thick_line_horizontal(x, y, color, 2);
     find_flag = 0;
   }
 
   p2p_val = (y_max - y_min) * 5;
-
-  ili9341_line_draw(initial_val, 140,
-                    initial_val, 140 - 64, line_color);
+  final_time_period = total_time_period/(time_period_counter-1);
+  // ili9341_line_draw(initial_val, 140,
+  //                   initial_val, 140 - 64, line_color);
 
 
   if (GPIOC->ODR & GPIO_ODR_OD6)
@@ -101,11 +125,11 @@ void displayValues(uint8_t zoomLevel)
   uint32_t averageValue;
   uint32_t peakToPeakValue;
   float timeSpan;
-  uint32_t rcTime;
-  uint32_t capacitanceValue;
+  float time_period;
+  float capacitanceValue;
 
 
-  get_metrics(&averageValue, &rcTime, &timeSpan, &capacitanceValue);
+  get_metrics(&averageValue, &time_period, &timeSpan, &capacitanceValue);
 
   char displayString[30];
   char floatBuf[32];
@@ -123,8 +147,8 @@ void displayValues(uint8_t zoomLevel)
   ili9341_text_pos_set(0, yPos++);
   ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
 
-  float2str(floatBuf, 30, (float)rcTime, 2);
-  sprintf(displayString, "RC: %s us", floatBuf);
+  float2str(floatBuf, 30, (float)time_period, 2);
+  sprintf(displayString, "T: %s us", floatBuf);
   ili9341_text_pos_set(0, yPos++);
   ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
 
