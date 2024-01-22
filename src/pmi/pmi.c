@@ -108,7 +108,7 @@ void TIM2_IRQHandler(void)
     }
 
 
-    if ((adc_val > 1024 && previous_adc_value < 1024) || (adc_val < 1024))
+    if ((adc_val > 1024 && previous_adc_value < 1024) || (adc_val < 1024 && previous_adc_value > 1024))
     {
       if (GPIOC->ODR & GPIO_ODR_OD4)
       {
@@ -120,7 +120,7 @@ void TIM2_IRQHandler(void)
       }
     }
 
-    if (adc_val > 3072  || adc_val < 3072)
+    if ((adc_val > 3072 && previous_adc_value < 3072) || (adc_val < 3072 && previous_adc_value > 3072))
     {
       if (GPIOC->ODR & GPIO_ODR_OD4)
       {
