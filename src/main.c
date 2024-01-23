@@ -1,13 +1,13 @@
 #include <uart.h>
 #include <clocks.h>
 #include <pmi.h>
-#include "ili9341.h"
+
 
 const float DIVISOR_MV = 4.095;
-uint8_t graph_ready = 0;
+volatile uint8_t graph_ready = 0;
 uint8_t rc_range = 0;
 uint32_t p2p_val = 0;
-uint8_t volatile zoom_lvl = 1;
+volatile uint8_t zoom_lvl = 1;
 uint16_t final_time_period = 0;
 
 int main(void)
@@ -15,16 +15,9 @@ int main(void)
   /* Call your initialisations here */
   clocks_init_pmi();
   uart_init_nucusb(115200);
-  ili9341_init(ILI9341_ORIENTATION_0); // initialize the LCD
-  // Clear the LCD
-  ili9341_rect_fill(0, 0, ili9341_display_info_get().width, ili9341_display_info_get().height, ILI9341_COLOR_BLACK);
 
-  adc_init();
+  initialize_project();
 
-  
-  TIM2_init();
-  TIM21_init();
-  initialize_gpio();
 
   while (1)
   {

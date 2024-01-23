@@ -3,6 +3,7 @@
 
 #include <stm32l0xx.h>
 #include "pmi_stddefs.h"
+#include "ili9341.h"
 
 extern const float DIVISOR_MV;
 extern uint8_t rc_range;

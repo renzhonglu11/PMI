@@ -7,7 +7,7 @@ uint16_t previous_adc_value = 4095;
 enum PMI_BOOL_E edge_detected = FALSE;
 enum PMI_BOOL_E first_reading_taken = TRUE;
 
-uint8_t data_ready = 0;
+volatile uint8_t data_ready = 0;
 volatile uint8_t debounce_in_progress = 0;
 volatile uint8_t pb2_pressed = 0;
 
@@ -104,14 +104,11 @@ void TIM2_IRQHandler(void)
 
       GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
       GPIOC->BSRR = GPIO_BSRR_BS_8;
-      
-
-
     }
     else if (adc_val >= 3071) // 4095*3/4 = 3071.25
     {
       GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) if it is currently set
-      
+
       GPIOC->BSRR = GPIO_BSRR_BR_8;
     }
 
@@ -308,5 +305,18 @@ uint32_t initial_interrupt(void)
   NVIC_EnableIRQ(EXTI0_1_IRQn);
   NVIC_EnableIRQ(EXTI2_3_IRQn);
 
+  return RC_SUCC;
+}
+
+uint32_t initialize_project()
+{
+  adc_init();
+  TIM2_init();
+  TIM21_init();
+  initialize_gpio();
+
+  ili9341_init(ILI9341_ORIENTATION_0); // initialize the LCD
+  // Clear the LCD
+  ili9341_rect_fill(0, 0, ili9341_display_info_get().width, ili9341_display_info_get().height, ILI9341_COLOR_BLACK);
   return RC_SUCC;
 }
