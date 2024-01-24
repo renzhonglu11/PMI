@@ -12,6 +12,9 @@
 #define BG_COLOR            ILI9341_COLOR_BLACK
 #define TXT_COLOR           ILI9341_COLOR_WHITE
 
+extern uint8_t error_flag;
+
+
 
 void get_metrics(uint32_t *average_voltage, float *time_period, float *timeSpan, float *capacitanceValue);
 

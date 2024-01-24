@@ -11,6 +11,7 @@ void get_metrics(uint32_t *average_voltage, float *time_period, float *timeSpan,
   *time_period = final_time_period * sampling_time_microseconds;
 
   // *capacitanceValue = *time_period;
+  
   *capacitanceValue = (float)(*time_period) / 2.197224577;         // nanofarads
   
   // sample frequence = 400us

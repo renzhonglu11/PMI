@@ -6,6 +6,9 @@
  */
 
 
+
+
+uint8_t error_flag = 0;
 void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, uint8_t thickness);
 
 
@@ -27,13 +30,24 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
 
   int16_t last_rising_edge = -1;
   uint16_t total_time_period = 0;
-  uint8_t time_period_counter = 0;
+  uint32_t time_period_counter = 0;
 
   uint16_t y_max = 0;
   uint8_t rc_flag = 0;
   int8_t find_flag = 0;
   uint8_t x_max = 0;
   uint16_t y_min = 4095;
+
+  if(buffer[0] <= 3 && buffer[2] <= 3 && buffer[4] <= 3)
+  {
+    error_flag = 1;
+    ili9341_text_pos_set(5, 3);
+    ili9341_str_print("ERROR!!!", ILI9341_COLOR_RED, BG_COLOR);
+    return RC_PARAM_INVALID;
+  }
+
+
+  error_flag = 0;
 
   // Plot the ADC values
   for (uint8_t i = 0; i < buffer_size; i++)
@@ -73,9 +87,12 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       }
     }
 
-    if(buffer[i] >= 2048 && buffer[i-1] < 2048 && i>5)
+    // maybe there are still electric charge in the capacitor??
+    // There will be part of the discharge curve on the left most side of the screen. 
+    // That means several values at the beginning of buffer are greater than 2048, we dont want to draw line for such values. 
+    if(buffer[i] >= 2048 && buffer[i-1] <= 2048 && i > 5)   
     { 
-      int16_t x_tmp = i * x_scale;
+      uint16_t x_tmp = i * x_scale;
       ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
 
       if(last_rising_edge!=-1)
@@ -93,6 +110,11 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     ili9341_draw_thick_line_horizontal(x, y, color, 2);
     find_flag = 0;
   }
+
+
+
+
+
 
   p2p_val = (y_max - y_min) * 5;
   final_time_period = total_time_period/(time_period_counter-1);
@@ -127,6 +149,11 @@ void displayValues(uint8_t zoomLevel)
   float timeSpan;
   float time_period;
   float capacitanceValue;
+
+  if(error_flag)
+  {
+    return;
+  }
 
 
   get_metrics(&averageValue, &time_period, &timeSpan, &capacitanceValue);

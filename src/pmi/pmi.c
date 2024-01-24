@@ -92,22 +92,22 @@ void TIM2_IRQHandler(void)
 
     uint16_t adc_val = (uint16_t)(ADC1->DR & 0xFFFF); // get ADC value
 
-    if (first_reading_taken)
-    {
-      previous_adc_value = adc_val;
-      first_reading_taken = FALSE;
-      return;
-    }
+    // if (first_reading_taken)
+    // {
+    //   previous_adc_value = adc_val;
+    //   first_reading_taken = FALSE;
+    //   return;
+    // }
 
     if (adc_val <= 1024) // 4095/4 = 1023.75
     {
 
-      GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) if it is currently reset
+      GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) 
       GPIOC->BSRR = GPIO_BSRR_BS_8;
     }
     else if (adc_val >= 3071) // 4095*3/4 = 3071.25
     {
-      GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) if it is currently set
+      GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) 
 
       GPIOC->BSRR = GPIO_BSRR_BR_8;
     }
@@ -125,15 +125,20 @@ void TIM2_IRQHandler(void)
     // Check if we have captured enough post-trigger samples
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
-
       // reset all the things here
       edge_detected = FALSE;
       // Now, adc_buffer contains 120 samples before and after the trigger
       // Process the buffer here or signal that it's ready to be processed
       extract_samples(extracted_data); // we get the current finish cirular buffer
-      graph_ready = 1;                 // inform main to draw the graph
-
       first_reading_taken = FALSE;
+
+      if(adc_buffer[current_index] == 0)
+      {
+        return;       
+      }
+
+
+      graph_ready = 1;                 // inform main to draw the graph
     }
 
     // TIM2->CR1 &= ~TIM_CR1_CEN;
