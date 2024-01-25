@@ -31,16 +31,20 @@ int main(void)
 
 
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
-      displayValues(zoom_lvl);
+      displayValues(zoom_lvl,ILI9341_COLOR_WHITE);
       systick_delay_ms(1100);
 
 
 
       GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
+
+      draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLACK);
+      displayValues(zoom_lvl, ILI9341_COLOR_BLACK);
       graph_ready = 0;
       data_ready = 0; // unlock extract_samples function
+      
     }
 
-    systick_delay_ms(300);
+    systick_delay_ms(200);
   }
 }

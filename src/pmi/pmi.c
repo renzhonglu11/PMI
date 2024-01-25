@@ -11,6 +11,7 @@ volatile uint8_t data_ready = 0;
 volatile uint8_t debounce_in_progress = 0;
 volatile uint8_t pb2_pressed = 0;
 
+
 uint32_t initial_interrupt(void);
 uint32_t config_button(void);
 uint32_t reset_TIM2_zoom_level();
@@ -66,6 +67,8 @@ void TIM6_IRQHandler(void)
   }
 }
 
+static uint8_t waiting_for_rise = 1;
+
 void TIM2_IRQHandler(void)
 {
   // TODO: take a deep look at the circular buffer
@@ -92,27 +95,36 @@ void TIM2_IRQHandler(void)
 
     uint16_t adc_val = (uint16_t)(ADC1->DR & 0xFFFF); // get ADC value
 
-    // if (first_reading_taken)
-    // {
-    //   previous_adc_value = adc_val;
-    //   first_reading_taken = FALSE;
-    //   return;
-    // }
-
-    if (adc_val <= 1024) // 4095/4 = 1023.75
+    if (first_reading_taken)
     {
-
-      GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1) 
-      GPIOC->BSRR = GPIO_BSRR_BS_8;
-    }
-    else if (adc_val >= 3071) // 4095*3/4 = 3071.25
-    {
-      GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0) 
-
-      GPIOC->BSRR = GPIO_BSRR_BR_8;
+      previous_adc_value = adc_val;
+      first_reading_taken = FALSE;
+      return;
     }
 
-    if (edge_detected == FALSE && (previous_adc_value >= adc_threshold) && (adc_val < adc_threshold))
+    if (waiting_for_rise)
+    {
+      if (adc_val >= 3071) // 4095*3/4 = 3071.25
+      {
+        GPIOC->BSRR = GPIO_BSRR_BR_4; // Reset PC4 (set it to 0)
+
+        GPIOC->BSRR = GPIO_BSRR_BR_8;
+        waiting_for_rise = 0;
+      }
+    }
+    else
+    {
+      if (adc_val <= 1024) // 4095/4 = 1023.75
+      {
+
+        GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 (set it to 1)
+        GPIOC->BSRR = GPIO_BSRR_BS_8;
+        waiting_for_rise = 1;
+      }
+    }
+
+
+    if (edge_detected == FALSE && (previous_adc_value > adc_threshold) && (adc_val < adc_threshold))
     {
       edge_detected = TRUE;
       trigger_index = current_index;
@@ -129,16 +141,18 @@ void TIM2_IRQHandler(void)
       edge_detected = FALSE;
       // Now, adc_buffer contains 120 samples before and after the trigger
       // Process the buffer here or signal that it's ready to be processed
+      
+
+      
       extract_samples(extracted_data); // we get the current finish cirular buffer
-      first_reading_taken = FALSE;
+      
 
-      if(adc_buffer[current_index] == 0)
-      {
-        return;       
-      }
+      // if (adc_buffer[current_index] == 0)
+      // {
+      //   return;
+      // }
 
-
-      graph_ready = 1;                 // inform main to draw the graph
+      graph_ready = 1; // inform main to draw the graph
     }
 
     // TIM2->CR1 &= ~TIM_CR1_CEN;
@@ -197,17 +211,17 @@ void TIM21_IRQHandler(void)
   }
 }
 
-uint8_t power_of_2(uint8_t exponent)
-{
-  uint8_t r = 1;
+// uint8_t power_of_2(uint8_t exponent)
+// {
+//   uint8_t r = 1;
 
-  for (uint8_t i = 1; i < exponent; i++)
-  {
-    r *= 2;
-  }
+//   for (uint8_t i = 1; i < exponent; i++)
+//   {
+//     r *= 2;
+//   }
 
-  return r;
-}
+//   return r;
+// }
 
 uint32_t reset_TIM2_zoom_level()
 {
@@ -272,6 +286,8 @@ uint32_t initialize_gpio()
   GPIOC->MODER &= ~(GPIO_MODER_MODE6); // Clear PC6 mode
   GPIOC->MODER |= GPIO_MODER_MODE6_0;  // Set PC6 as output
 
+
+  GPIOC->BSRR = GPIO_BSRR_BS_4;  // Set PC4 by default, so the capcitor is charging
   return RC_SUCC;
 }
 

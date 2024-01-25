@@ -1,24 +1,17 @@
 #include "common.h"
 
-
 /**
  * @brief Necessary utilities to draw a graph and its metrics on the LCD
  */
 
-
-
-
 uint8_t error_flag = 0;
 void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, uint8_t thickness);
-
-
-
 
 uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t line_color)
 {
 
   // Clear the display or just the area where you will draw the graph
-  ili9341_rect_fill(0, 0, ili9341_display_info_get().width, ili9341_display_info_get().height, BG_COLOR);
+  // ili9341_rect_fill(0, 0, ili9341_display_info_get().width, 150, BG_COLOR);
 
   struct display_info_s display_info = ili9341_display_info_get();
 
@@ -37,8 +30,9 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
   int8_t find_flag = 0;
   uint8_t x_max = 0;
   uint16_t y_min = 4095;
+  error_flag = 0;
 
-  if(buffer[0] <= 3 && buffer[2] <= 3 && buffer[4] <= 3)
+  if (buffer[0] <= 3 && buffer[2] <= 3 && buffer[4] <= 3)
   {
     error_flag = 1;
     ili9341_text_pos_set(5, 3);
@@ -46,8 +40,32 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     return RC_PARAM_INVALID;
   }
 
+  for (uint8_t i = 1; i < buffer_size; i++)
+  {
 
-  error_flag = 0;
+    if (buffer[i] >= (2048) && buffer[i - 1] <= (2048)) // ensure its falling phase, i start with 1
+    {
+      uint16_t x_tmp = i * x_scale;
+      ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
+
+      if (last_rising_edge != -1)
+      {
+        uint16_t cur_time = (i - last_rising_edge);
+        total_time_period += cur_time;
+      }
+
+      last_rising_edge = i;
+      time_period_counter++;
+    }
+  }
+
+  if (total_time_period == 0)
+  {
+    error_flag = 1;
+    ili9341_text_pos_set(5, 3);
+    ili9341_str_print("ERROR!!!", ILI9341_COLOR_RED, BG_COLOR);
+    return RC_PARAM_INVALID;
+  }
 
   // Plot the ADC values
   for (uint8_t i = 0; i < buffer_size; i++)
@@ -68,7 +86,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     // charging
     if (i > 0 && buffer[i] > buffer[i - 1])
     {
-      
+
       // y_max = buffer[i];
       x_max = i;
       find_flag = 1;
@@ -78,7 +96,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     if (i > 0 && !find_flag && !rc_flag)
     {
       uint16_t target_val = (y_max * 368) / 1000; // easy numeric approximation
-      
+
       if (buffer[i] <= target_val)
       {
         rc_flag = 1;
@@ -87,40 +105,18 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       }
     }
 
-    // maybe there are still electric charge in the capacitor??
-    // There will be part of the discharge curve on the left most side of the screen. 
-    // That means several values at the beginning of buffer are greater than 2048, we dont want to draw line for such values. 
-    if(buffer[i] >= 2048 && buffer[i-1] <= 2048 && i > 5)   
-    { 
-      uint16_t x_tmp = i * x_scale;
-      ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
 
-      if(last_rising_edge!=-1)
-      {
-        uint16_t cur_time = (i-last_rising_edge);
-        total_time_period += cur_time;
-      }
-
-      last_rising_edge = i;
-      time_period_counter++;
-    }
-
-
-   
     ili9341_draw_thick_line_horizontal(x, y, color, 2);
     find_flag = 0;
   }
 
-
-
-
-
+  // ili9341_line_draw(120, 140, 120, 140 - 64, ILI9341_COLOR_BLUE);
 
   p2p_val = (y_max - y_min) * 5;
-  final_time_period = total_time_period/(time_period_counter-1);
+  final_time_period = total_time_period / (time_period_counter - 1);
+
   // ili9341_line_draw(initial_val, 140,
   //                   initial_val, 140 - 64, line_color);
-
 
   if (GPIOC->ODR & GPIO_ODR_OD6)
   {
@@ -138,9 +134,7 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
   }
 }
 
-
-
-void displayValues(uint8_t zoomLevel)
+void displayValues(uint8_t zoomLevel,uint16_t txt_color)
 {
   // TODO: display all the values on the LCD
 
@@ -149,47 +143,49 @@ void displayValues(uint8_t zoomLevel)
   float timeSpan;
   float time_period;
   float capacitanceValue;
-
-  if(error_flag)
-  {
-    return;
-  }
-
-
-  get_metrics(&averageValue, &time_period, &timeSpan, &capacitanceValue);
-
   char displayString[30];
   char floatBuf[32];
   int yPos = 8; // Example Y position, adjust based on your graph position
 
+  if (error_flag)
+  {
+    sprintf(displayString, "Zoom: %d", zoomLevel);
+    ili9341_text_pos_set(0, 13);  // hard code here
+    ili9341_str_print(displayString, txt_color, BG_COLOR);
+    return;
+  }
+
+  get_metrics(&averageValue, &time_period, &timeSpan, &capacitanceValue);
+
+
   peakToPeakValue = p2p_val;
-  
+
   float2str(floatBuf, 30, (float)averageValue / DIVISOR_MV, 2);
   sprintf(displayString, "Avg: %s mV", floatBuf);
   ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
+  ili9341_str_print(displayString, txt_color, BG_COLOR);
 
   float2str(floatBuf, 30, (float)peakToPeakValue / DIVISOR_MV, 2);
   sprintf(displayString, "P-P: %s mV", floatBuf);
   ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
+  ili9341_str_print(displayString, txt_color, BG_COLOR);
 
   float2str(floatBuf, 30, (float)time_period, 2);
   sprintf(displayString, "T: %s us", floatBuf);
   ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
+  ili9341_str_print(displayString, txt_color, BG_COLOR);
 
   float2str(floatBuf, 30, (float)capacitanceValue, 2);
   sprintf(displayString, "C: %s nF", floatBuf);
   ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
+  ili9341_str_print(displayString, txt_color, BG_COLOR);
 
   float2str(floatBuf, 30, timeSpan, 2);
   sprintf(displayString, "Span: %s ms", floatBuf);
   ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
+  ili9341_str_print(displayString, txt_color, BG_COLOR);
 
   sprintf(displayString, "Zoom: %d", zoomLevel);
   ili9341_text_pos_set(0, yPos);
-  ili9341_str_print(displayString, TXT_COLOR, BG_COLOR);
+  ili9341_str_print(displayString, txt_color, BG_COLOR);
 }

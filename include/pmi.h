@@ -23,6 +23,7 @@ extern volatile uint8_t graph_ready;
 extern volatile uint8_t data_ready;
 
 
+
 uint32_t initialize_gpio();
 uint32_t extract_samples(uint16_t *extracted_data);
 uint32_t initialize_project();

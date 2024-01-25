@@ -17,4 +17,6 @@ extern uint16_t final_time_period;
 #define POST_TRIGGER_COUNT 120
 
 
+uint8_t power_of_2(uint8_t exponent);
+
 #endif /* GLOBAL_COMMON_H */

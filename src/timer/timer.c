@@ -25,7 +25,7 @@ uint32_t TIM2_init()
   TIM2->DIER |= TIM_DIER_UIE; // Enable update interrupt
 
   NVIC_ClearPendingIRQ(TIM2_IRQn);
-  NVIC_SetPriority(TIM2_IRQn, 2);
+  NVIC_SetPriority(TIM2_IRQn, 1);
   NVIC_EnableIRQ(TIM2_IRQn);
 
   TIM2->CR1 |= TIM_CR1_CEN; // Start Timer 2
@@ -82,7 +82,7 @@ uint32_t TIM21_init()
   TIM21->DIER |= TIM_DIER_UIE; // Enable update interrupt
 
   NVIC_ClearPendingIRQ(TIM21_IRQn);
-  NVIC_SetPriority(TIM21_IRQn, 1);
+  NVIC_SetPriority(TIM21_IRQn, 2);
   NVIC_EnableIRQ(TIM21_IRQn);
 
 
