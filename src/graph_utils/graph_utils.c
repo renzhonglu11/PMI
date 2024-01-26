@@ -9,11 +9,10 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
 
 uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t line_color)
 {
+  struct display_info_s display_info = ili9341_display_info_get();
 
   // Clear the display or just the area where you will draw the graph
-  // ili9341_rect_fill(0, 0, ili9341_display_info_get().width, 150, BG_COLOR);
-
-  struct display_info_s display_info = ili9341_display_info_get();
+  // ili9341_rect_fill(0, 0, display_info.width, 150, BG_COLOR);
 
   // Determine scaling factors based on the display size and ADC range
   uint16_t x_scale = display_info.width / buffer_size;
@@ -36,7 +35,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
   {
     error_flag = 1;
     ili9341_text_pos_set(5, 3);
-    ili9341_str_print("ERROR!!!", ILI9341_COLOR_RED, BG_COLOR);
+    ili9341_str_print("ERROR!!!", line_color, BG_COLOR);
     return RC_PARAM_INVALID;
   }
 
@@ -63,7 +62,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
   {
     error_flag = 1;
     ili9341_text_pos_set(5, 3);
-    ili9341_str_print("ERROR!!!", ILI9341_COLOR_RED, BG_COLOR);
+    ili9341_str_print("ERROR!!!", line_color, BG_COLOR);
     return RC_PARAM_INVALID;
   }
 
@@ -105,7 +104,6 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       }
     }
 
-
     ili9341_draw_thick_line_horizontal(x, y, color, 2);
     find_flag = 0;
   }
@@ -134,7 +132,7 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
   }
 }
 
-void displayValues(uint8_t zoomLevel,uint16_t txt_color)
+void displayValues(uint8_t zoomLevel, uint16_t txt_color)
 {
   // TODO: display all the values on the LCD
 
@@ -147,16 +145,20 @@ void displayValues(uint8_t zoomLevel,uint16_t txt_color)
   char floatBuf[32];
   int yPos = 8; // Example Y position, adjust based on your graph position
 
+  struct display_info_s display_info = ili9341_display_info_get();
+
+  // Clear the display or just the area where you will draw the graph
+  ili9341_rect_fill(0, 160, 220, 160, BG_COLOR);
+
   if (error_flag)
   {
     sprintf(displayString, "Zoom: %d", zoomLevel);
-    ili9341_text_pos_set(0, 13);  // hard code here
+    ili9341_text_pos_set(0, 13); // hard code here
     ili9341_str_print(displayString, txt_color, BG_COLOR);
     return;
   }
 
   get_metrics(&averageValue, &time_period, &timeSpan, &capacitanceValue);
-
 
   peakToPeakValue = p2p_val;
 
