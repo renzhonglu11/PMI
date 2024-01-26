@@ -132,62 +132,56 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
   }
 }
 
+
+
+
 void displayValues(uint8_t zoomLevel, uint16_t txt_color)
 {
-  // TODO: display all the values on the LCD
-
-  uint32_t averageValue;
-  uint32_t peakToPeakValue;
-  float timeSpan;
-  float time_period;
-  float capacitanceValue;
-  char displayString[30];
-  char floatBuf[32];
   int yPos = 8; // Example Y position, adjust based on your graph position
 
-  struct display_info_s display_info = ili9341_display_info_get();
+  // display template
+  display_template();
 
-  // Clear the display or just the area where you will draw the graph
-  ili9341_rect_fill(0, 160, 220, 160, BG_COLOR);
+  uint32_t averageValue, peakToPeakValue;
+  float timeSpan, time_period, capacitanceValue;
+  char valueString[30], labelString[30], floatBuf[32];
+
+
+  // Clear and refresh only values, keep labels static
+  for (int i = 0; i < NUM_DISPLAY_LINES; i++)
+  {
+    ili9341_text_pos_set(7, yPos + i); // 50 is an arbitrary value, adjust as per your layout
+    ili9341_str_clear(8, BG_COLOR);    // Clear space for the value
+  }
 
   if (error_flag)
   {
-    sprintf(displayString, "Zoom: %d", zoomLevel);
-    ili9341_text_pos_set(0, 13); // hard code here
-    ili9341_str_print(displayString, txt_color, BG_COLOR);
+    sprintf(labelString, "%d", zoomLevel);
+    ili9341_text_pos_set(7, yPos + 5);
+    ili9341_str_print(labelString, txt_color, BG_COLOR);
     return;
   }
 
   get_metrics(&averageValue, &time_period, &timeSpan, &capacitanceValue);
-
   peakToPeakValue = p2p_val;
 
-  float2str(floatBuf, 30, (float)averageValue / DIVISOR_MV, 2);
-  sprintf(displayString, "Avg: %s mV", floatBuf);
-  ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, txt_color, BG_COLOR);
+  float values[NUM_DISPLAY_LINES] = {
+      (float)averageValue / DIVISOR_MV,
+      (float)peakToPeakValue / DIVISOR_MV,
+      (float)time_period,
+      (float)capacitanceValue,
+      timeSpan,
+      (float)zoomLevel};
 
-  float2str(floatBuf, 30, (float)peakToPeakValue / DIVISOR_MV, 2);
-  sprintf(displayString, "P-P: %s mV", floatBuf);
-  ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, txt_color, BG_COLOR);
-
-  float2str(floatBuf, 30, (float)time_period, 2);
-  sprintf(displayString, "T: %s us", floatBuf);
-  ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, txt_color, BG_COLOR);
-
-  float2str(floatBuf, 30, (float)capacitanceValue, 2);
-  sprintf(displayString, "C: %s nF", floatBuf);
-  ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, txt_color, BG_COLOR);
-
-  float2str(floatBuf, 30, timeSpan, 2);
-  sprintf(displayString, "Span: %s ms", floatBuf);
-  ili9341_text_pos_set(0, yPos++);
-  ili9341_str_print(displayString, txt_color, BG_COLOR);
-
-  sprintf(displayString, "Zoom: %d", zoomLevel);
-  ili9341_text_pos_set(0, yPos);
-  ili9341_str_print(displayString, txt_color, BG_COLOR);
+  for (int i = 0; i < NUM_DISPLAY_LINES - 1; i++)
+  {
+    float2str(floatBuf, 30, values[i], 1);
+    sprintf(valueString, "%s", floatBuf);
+    ili9341_text_pos_set(7, yPos + i);
+    ili9341_str_print(valueString, txt_color, BG_COLOR);
+  }
+  // For Zoom level, no need for float conversion
+  sprintf(valueString, "%d", zoomLevel);
+  ili9341_text_pos_set(7, yPos + 5);
+  ili9341_str_print(valueString, txt_color, BG_COLOR);
 }
