@@ -32,8 +32,8 @@ int main(void)
 
     if (graph_ready)
     {
-
-      data_ready = 1; // lock extract_samples function
+      extract_samples(extracted_data);
+      // data_ready = 1; // lock extract_samples function
 
 
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
@@ -46,6 +46,8 @@ int main(void)
       GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
       graph_ready = 0;
       data_ready = 0; // unlock extract_samples function
+      TIM2->CNT = 0; 
+      TIM2->CR1 |= TIM_CR1_CEN; // Start Timer 2
     }
   }
 }

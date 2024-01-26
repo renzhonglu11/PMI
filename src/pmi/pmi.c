@@ -15,14 +15,13 @@ uint32_t initial_interrupt(void);
 uint32_t config_button(void);
 uint32_t reset_TIM2_zoom_level();
 
-
 uint32_t extract_samples(uint16_t *extracted_data)
 {
-  if (data_ready)
-  {
-    // we get the data, now lock this function
-    return RC_SUCC;
-  }
+  // if (data_ready)
+  // {
+  //   // we get the data, now lock this function
+  //   return RC_SUCC;
+  // }
 
   uint8_t start_index = (trigger_index - PRE_TRIGGER_COUNT + BUFFER_SIZE) % BUFFER_SIZE;
 
@@ -79,7 +78,8 @@ void TIM2_IRQHandler(void)
     if (ADC1->CR & ADC_CR_ADSTART)
     {
       ADC1->CR |= ADC_CR_ADSTP; // stop conversion
-      while (ADC1->CR & ADC_CR_ADSTP);
+      while (ADC1->CR & ADC_CR_ADSTP)
+        ;
     }
 
     ADC1->CR |= ADC_CR_ADSTART; // start conversion
@@ -112,18 +112,16 @@ void TIM2_IRQHandler(void)
     // Check if we have captured enough post-trigger samples
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
-
       // reset all the things here
+
+
+
       edge_detected = FALSE;
-      // Now, adc_buffer contains 120 samples before and after the trigger
-      // Process the buffer here or signal that it's ready to be processed
-      extract_samples(extracted_data); // we get the current finish cirular buffer
-      graph_ready = 1;                 // inform main to draw the graph
-
+      graph_ready = 1; // inform main to draw the graph
       first_reading_taken = FALSE;
+      current_index = 0;
+      TIM2->CR1 &= ~TIM_CR1_CEN; // now we have enough sampled data, stop the timer
     }
-
-    // TIM2->CR1 &= ~TIM_CR1_CEN;
   }
 }
 
@@ -146,7 +144,6 @@ uint32_t TIM2_init()
   TIM2->ARR = 400 - 1; // Set auto-reload to 400
 
   TIM2->CR1 |= TIM_CR1_ARPE; // Enable auto-reload preload
-
 
   TIM2->DIER |= TIM_DIER_UIE; // Enable update interrupt
 
@@ -219,7 +216,6 @@ void TIM21_IRQHandler(void)
         zoom_lvl -= 1; // Decrease zoom level
         reset_TIM2_zoom_level();
       }
-
     }
 
     // Process button action for PB2
@@ -234,14 +230,12 @@ void TIM21_IRQHandler(void)
         zoom_lvl += 1; // Increase zoom level
         reset_TIM2_zoom_level();
       }
-
     }
 
     // Reset debounce flag
     debounce_in_progress = 0;
   }
 }
-
 
 uint32_t TIM21_init()
 {
@@ -265,21 +259,19 @@ uint32_t TIM21_init()
   NVIC_SetPriority(TIM21_IRQn, 1);
   NVIC_EnableIRQ(TIM21_IRQn);
 
-
-
   return RC_SUCC;
 }
 
 uint8_t power_of_2(uint8_t exponent)
 {
-    uint8_t r = 1;
+  uint8_t r = 1;
 
-    for (uint8_t i = 1; i < exponent; i++)
-    {
-        r *= 2;
-    }
+  for (uint8_t i = 1; i < exponent; i++)
+  {
+    r *= 2;
+  }
 
-    return r;
+  return r;
 }
 
 uint32_t reset_TIM2_zoom_level()
@@ -291,21 +283,19 @@ uint32_t reset_TIM2_zoom_level()
   return RC_SUCC;
 }
 
-
 void EXTI2_3_IRQHandler()
 {
   // PB2 for SW1
   if ((EXTI->PR & EXTI_PR_PIF2)) // pending bit of EXTI line 2 is set
   {
 
-    if(!debounce_in_progress)
+    if (!debounce_in_progress)
     {
-    pb2_pressed = 1;
-    // Start debounce timer
-    debounce_in_progress = 1; // debounce in progress
-    TIM21->CNT = 0;           // Reset the timer count
-    TIM21->CR1 |= TIM_CR1_CEN;
-
+      pb2_pressed = 1;
+      // Start debounce timer
+      debounce_in_progress = 1; // debounce in progress
+      TIM21->CNT = 0;           // Reset the timer count
+      TIM21->CR1 |= TIM_CR1_CEN;
     }
   }
   EXTI->PR = EXTI_PR_PIF2; // write one to corresponding pending bit to clear pending bit
@@ -319,13 +309,12 @@ void EXTI0_1_IRQHandler(void)
   if ((EXTI->PR & EXTI_PR_PIF1))
   {
 
-    if(!debounce_in_progress)
+    if (!debounce_in_progress)
     {
-    // Start debounce timer
-    debounce_in_progress = 1; // debounce in progress
-    TIM21->CNT = 0;           // Reset the timer count
-    TIM21->CR1 |= TIM_CR1_CEN;
-
+      // Start debounce timer
+      debounce_in_progress = 1; // debounce in progress
+      TIM21->CNT = 0;           // Reset the timer count
+      TIM21->CR1 |= TIM_CR1_CEN;
     }
   }
   EXTI->PR = EXTI_PR_PIF1;
@@ -360,12 +349,10 @@ uint32_t config_button(void)
   GPIOB->MODER &= ~(GPIO_MODER_MODE2); // PB2 for SW1
   GPIOB->MODER &= ~(GPIO_MODER_MODE1); // PB1 for SW2
 
-
   initial_interrupt();
 
   return RC_SUCC;
 }
-
 
 uint32_t initial_interrupt(void)
 {
