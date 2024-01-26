@@ -7,27 +7,22 @@ uint16_t previous_adc_value = 4095;
 enum PMI_BOOL_E edge_detected = FALSE;
 enum PMI_BOOL_E first_reading_taken = TRUE;
 
+static uint8_t waiting_for_rise = 1;
+
 volatile uint8_t data_ready = 0;
 volatile uint8_t debounce_in_progress = 0;
 volatile uint8_t pb2_pressed = 0;
-
 
 uint32_t initial_interrupt(void);
 uint32_t config_button(void);
 uint32_t reset_TIM2_zoom_level();
 
+
+
 uint32_t extract_samples(uint16_t *extracted_data)
 {
-  if (data_ready)
-  {
-    // we get the data, now lock this function
-    return RC_SUCC;
-  }
-
-  uint8_t start_index = (trigger_index - PRE_TRIGGER_COUNT + BUFFER_SIZE) % BUFFER_SIZE;
-
   uint8_t end_index = (trigger_index + POST_TRIGGER_COUNT) % BUFFER_SIZE;
-
+  uint8_t start_index = end_index;
   // uint16_t extracted_data[BUFFER_SIZE]; // Array to hold the extracted data
   int extracted_index = 0;
 
@@ -36,10 +31,6 @@ uint32_t extract_samples(uint16_t *extracted_data)
     extracted_data[extracted_index++] = adc_buffer[start_index];
     start_index = (start_index + 1) % BUFFER_SIZE;
 
-    if (start_index == end_index)
-    {
-      break; // Stop when we reach the end index
-    }
   }
 
   return RC_SUCC;
@@ -67,11 +58,10 @@ void TIM6_IRQHandler(void)
   }
 }
 
-static uint8_t waiting_for_rise = 1;
 
 void TIM2_IRQHandler(void)
 {
-  // TODO: take a deep look at the circular buffer
+  // ensure ISR is short enough!!!!!
 
   if (TIM2->SR & TIM_SR_UIF)
   {
@@ -87,20 +77,13 @@ void TIM2_IRQHandler(void)
 
     ADC1->CR |= ADC_CR_ADSTART; // start conversion
 
-    // Wait for end of conversion (EOC)
+
     while (!(ADC1->ISR & ADC_ISR_EOC))
       ;
 
     ADC1->ISR |= ADC_ISR_EOC; // clear EOC bit
 
     uint16_t adc_val = (uint16_t)(ADC1->DR & 0xFFFF); // get ADC value
-
-    if (first_reading_taken)
-    {
-      previous_adc_value = adc_val;
-      first_reading_taken = FALSE;
-      return;
-    }
 
     if (waiting_for_rise)
     {
@@ -123,39 +106,45 @@ void TIM2_IRQHandler(void)
       }
     }
 
+    if (first_reading_taken)
+    {
+      previous_adc_value = adc_val;
+      first_reading_taken = FALSE;
+      return;
+    }
 
     if (edge_detected == FALSE && (previous_adc_value > adc_threshold) && (adc_val < adc_threshold))
     {
-      edge_detected = TRUE;
+      // clever way to ensure we have 120 pre-trigger samples
+      if (current_index % BUFFER_SIZE < 120)   
+      {
+        edge_detected = FALSE;
+      }else
+      {
+        edge_detected = TRUE;
+      }
+
       trigger_index = current_index;
+
     }
 
     adc_buffer[current_index] = adc_val;               // Store in buffer
     previous_adc_value = adc_val;                      // Update for next comparison
     current_index = (current_index + 1) % BUFFER_SIZE; // Increment and wrap index
 
+
     // Check if we have captured enough post-trigger samples
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
-      // reset all the things here
+      // everything will be reset here
       edge_detected = FALSE;
-      // Now, adc_buffer contains 120 samples before and after the trigger
-      // Process the buffer here or signal that it's ready to be processed
-      
-
-      
-      extract_samples(extracted_data); // we get the current finish cirular buffer
-      
-
-      // if (adc_buffer[current_index] == 0)
-      // {
-      //   return;
-      // }
-
-      graph_ready = 1; // inform main to draw the graph
+      graph_ready = 1;                     // inform main to draw the graph
+      first_reading_taken = FALSE;
+      current_index = 0;
+      TIM2->CR1 &= ~TIM_CR1_CEN;           // now we have enough sampled data, stop the timer
     }
 
-    // TIM2->CR1 &= ~TIM_CR1_CEN;
+
   }
 }
 
@@ -286,8 +275,7 @@ uint32_t initialize_gpio()
   GPIOC->MODER &= ~(GPIO_MODER_MODE6); // Clear PC6 mode
   GPIOC->MODER |= GPIO_MODER_MODE6_0;  // Set PC6 as output
 
-
-  GPIOC->BSRR = GPIO_BSRR_BS_4;  // Set PC4 by default, so the capcitor is charging
+  GPIOC->BSRR = GPIO_BSRR_BS_4; // Set PC4 by default, so the capcitor is charging
   return RC_SUCC;
 }
 

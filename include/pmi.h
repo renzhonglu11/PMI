@@ -18,10 +18,8 @@ uint16_t adc_buffer[BUFFER_SIZE];
 uint16_t extracted_data[BUFFER_SIZE];
 
 
-
 extern volatile uint8_t graph_ready;
 extern volatile uint8_t data_ready;
-
 
 
 uint32_t initialize_gpio();

@@ -22,18 +22,15 @@ int main(void)
   while (1)
   {
     
-    // systick_delay_ms(300);
+    systick_delay_ms(300);
 
     if (graph_ready)
     {
 
-      data_ready = 1; // lock extract_samples function
-
-
+      extract_samples(extracted_data);
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
       displayValues(zoom_lvl,ILI9341_COLOR_WHITE);
-      systick_delay_ms(1100);
-
+      systick_delay_ms(700);
 
 
       GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
@@ -42,7 +39,7 @@ int main(void)
       // displayValues(zoom_lvl, ILI9341_COLOR_BLACK);
       graph_ready = 0;
       data_ready = 0; // unlock extract_samples function
-      
+      TIM2->CR1 |= TIM_CR1_CEN; // Start Timer 2
     }
 
     
