@@ -141,6 +141,11 @@ void TIM2_IRQHandler(void)
       graph_ready = 1;                     // inform main to draw the graph
       first_reading_taken = FALSE;
       current_index = 0;
+      waiting_for_rise = 1;
+      if (!(GPIOC->ODR & GPIO_ODR_OD4))   // check whether PIN 4 in initial state
+      {
+        GPIOC->BSRR = GPIO_BSRR_BS_4; 
+      }
       TIM2->CR1 &= ~TIM_CR1_CEN;           // now we have enough sampled data, stop the timer
     }
 

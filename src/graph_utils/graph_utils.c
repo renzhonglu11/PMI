@@ -10,9 +10,15 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
 uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t line_color)
 {
   struct display_info_s display_info = ili9341_display_info_get();
+  if (GPIOC->ODR & GPIO_ODR_OD6)
+  {
+    GPIOC->BSRR = GPIO_BSRR_BR_6; // Reset PC4 (set it to 0) if it is currently set
+  }
+  else
+  {
+    GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
+  }
 
-  // Clear the display or just the area where you will draw the graph
-  // ili9341_rect_fill(0, 0, display_info.width, 150, BG_COLOR);
 
   // Determine scaling factors based on the display size and ADC range
   uint16_t x_scale = display_info.width / buffer_size;
@@ -116,10 +122,6 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
   // ili9341_line_draw(initial_val, 140,
   //                   initial_val, 140 - 64, line_color);
 
-  if (GPIOC->ODR & GPIO_ODR_OD6)
-  {
-    GPIOC->BSRR = GPIO_BSRR_BR_6; // Reset PC4 (set it to 0) if it is currently set
-  }
 
   return RC_SUCC;
 }
@@ -132,9 +134,6 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
   }
 }
 
-
-
-
 void displayValues(uint8_t zoomLevel, uint16_t txt_color)
 {
   int yPos = 8; // Example Y position, adjust based on your graph position
@@ -145,7 +144,6 @@ void displayValues(uint8_t zoomLevel, uint16_t txt_color)
   uint32_t averageValue, peakToPeakValue;
   float timeSpan, time_period, capacitanceValue;
   char valueString[30], labelString[30], floatBuf[32];
-
 
   // Clear and refresh only values, keep labels static
   for (int i = 0; i < NUM_DISPLAY_LINES; i++)
