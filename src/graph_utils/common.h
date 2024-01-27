@@ -12,9 +12,10 @@
 #define BG_COLOR            ILI9341_COLOR_BLACK
 #define TXT_COLOR           ILI9341_COLOR_WHITE
 
+#define NUM_DISPLAY_LINES 6
 
 void get_metrics(uint32_t *average_voltage, uint32_t *rc_time_microseconds, float *timeSpan, uint32_t *capacitanceValue);
-
+uint32_t display_template();
 
 
 #endif /* COMMON_H */

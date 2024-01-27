@@ -32,18 +32,15 @@ int main(void)
 
     if (graph_ready)
     {
+      
       extract_samples(extracted_data);
-      // data_ready = 1; // lock extract_samples function
-
-
+      
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
       displayValues(zoom_lvl);
-      systick_delay_ms(1100);
+      systick_delay_ms(700);
+      draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLACK);
 
-      // draw_graph(extracted_data, BUFFER_SIZE,ILI9341_COLOR_BLACK);
 
-
-      GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
       graph_ready = 0;
       data_ready = 0; // unlock extract_samples function
       TIM2->CNT = 0; 
