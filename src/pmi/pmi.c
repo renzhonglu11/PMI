@@ -101,7 +101,13 @@ void TIM2_IRQHandler(void)
 
     if (edge_detected == FALSE && (previous_adc_value >= adc_threshold) && (adc_val < adc_threshold))
     {
-      edge_detected = TRUE;
+      if (current_index % BUFFER_SIZE < 120)   
+      {
+        edge_detected = FALSE;
+      }else
+      {
+        edge_detected = TRUE;
+      }
       trigger_index = current_index;
     }
 
@@ -113,8 +119,6 @@ void TIM2_IRQHandler(void)
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
       // reset all the things here
-
-
 
       edge_detected = FALSE;
       graph_ready = 1; // inform main to draw the graph
