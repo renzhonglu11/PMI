@@ -37,7 +37,8 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t curve_color, ui
 
   error_flag = 0;
   display_error(buffer, line_color);
-  if(error_flag){
+  if (error_flag)
+  {
     return RC_PARAM_INVALID;
   }
 
@@ -53,7 +54,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t curve_color, ui
     }
 
     // charging
-    if (i > 0 && buffer[i] >= buffer[i - 1])
+    if (i > 0 && (buffer[i] >= buffer[i - 1]) && y_max <= buffer[i])
     {
       initial_val = i;
       y_max = buffer[i];
@@ -109,7 +110,10 @@ uint32_t display_error(uint16_t buffer[], uint16_t line_color)
     }
   }
 
-  if (only_falling_edge)
+
+  
+
+  if (only_falling_edge || (buffer[119] - buffer[120] > 4000))
   {
     error_flag = 1;
     ili9341_text_pos_set(5, 3);
@@ -123,7 +127,6 @@ uint32_t display_error(uint16_t buffer[], uint16_t line_color)
 void displayValues(uint8_t zoomLevel, uint16_t txt_color)
 {
   int yPos = 8; // Example Y position, adjust based on your graph position
-
 
   // display template
   display_template();
