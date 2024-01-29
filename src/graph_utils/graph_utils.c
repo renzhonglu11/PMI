@@ -8,17 +8,25 @@ uint8_t error_flag = 0;
 void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, uint8_t thickness);
 
 
+
+/**
+ * @brief Draws a graph on the display using the provided buffer of ADC values.
+ *
+ * This function takes an array of ADC values and draws a graph on the display based on those values.
+ * The graph is drawn using the specified color and line color.
+ *
+ * @param buffer The buffer of ADC values.
+ * @param buffer_size The size of the buffer.
+ * @param color The color to use for drawing the graph.
+ * @param line_color The color to use for drawing the lines.
+ * @return Returns RC_SUCC if the graph is successfully drawn, or RC_PARAM_INVALID if there is an error.
+ */
 uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t line_color)
 {
   struct display_info_s display_info = ili9341_display_info_get();
 
-  // Clear the display or just the area where you will draw the graph
-  // ili9341_rect_fill(0, 0, display_info.width, 150, BG_COLOR);
-
   // Determine scaling factors based on the display size and ADC range
   uint16_t x_scale = display_info.width / buffer_size;
-  // uint16_t x_scale = display_info.width / 120;
-  // uint16_t y_scale = 62 / 4096;  // Assuming 12-bit ADC
   float y_scale = 64.0 / 4096.0; // Now y_scale is a floating-point number
 
   int16_t last_rising_edge = -1;
@@ -101,7 +109,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       {
         rc_flag = 1;
         rc_range = i - x_max;
-        // ili9341_line_draw(x, 140, x, 140 - 64, line_color);
+        
       }
     }
 
@@ -109,13 +117,12 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     find_flag = 0;
   }
 
-  // ili9341_line_draw(120, 140, 120, 140 - 64, ILI9341_COLOR_BLUE);
+
 
   p2p_val = (y_max - y_min) * 5;
   final_time_period = total_time_period / (time_period_counter - 1);
 
-  // ili9341_line_draw(initial_val, 140,
-  //                   initial_val, 140 - 64, line_color);
+
 
   if (GPIOC->ODR & GPIO_ODR_OD6)
   {
@@ -128,6 +135,14 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
 
 
 
+/**
+ * Draws a horizontal line with a specified thickness on the ILI9341 display.
+ *
+ * @param x The starting x-coordinate of the line.
+ * @param y The y-coordinate of the line.
+ * @param color The color of the line.
+ * @param thickness The thickness of the line.
+ */
 void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, uint8_t thickness)
 {
   for (int i = 0; i < thickness; i++)
@@ -139,6 +154,16 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
 
 
 
+/**
+ * @brief Displays the values on the screen.
+ *
+ * This function displays various values on the screen, such as average value, peak-to-peak value,
+ * time period, capacitance value, time span, and zoom level. It clears and refreshes only the values,
+ * while keeping the labels static. If there is an error flag, it displays the zoom level and returns.
+ *
+ * @param zoomLevel The zoom level to be displayed.
+ * @param txt_color The text color to be used for displaying the values.
+ */
 void displayValues(uint8_t zoomLevel, uint16_t txt_color)
 {
   int yPos = 8; // Example Y position, adjust based on your graph position

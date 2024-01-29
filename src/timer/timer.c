@@ -9,8 +9,15 @@ enum PMI_BOOL_E edge_detected = FALSE;
 enum PMI_BOOL_E first_reading_taken = TRUE;
 
 
-
-
+/**
+ * @brief Interrupt handler for TIM2.
+ * 
+ * This function is called when the TIM2 update interrupt occurs. It handles the ADC conversion and data storage in a buffer.
+ * The function checks for the update interrupt flag, stops the ADC conversion if it is in progress, starts a new conversion, and waits for the conversion to complete.
+ * It then retrieves the ADC value, checks if it meets the threshold for edge detection, and stores it in the buffer.
+ * If enough post-trigger samples have been captured, the function sets a flag to inform the main program to draw the graph and resets various variables.
+ * Finally, the function stops the timer if enough data has been sampled.
+ */
 void TIM2_IRQHandler(void)
 {
   // ensure ISR is short enough!!!!!
@@ -28,7 +35,6 @@ void TIM2_IRQHandler(void)
     }
 
     ADC1->CR |= ADC_CR_ADSTART; // start conversion
-
 
     while (!(ADC1->ISR & ADC_ISR_EOC))
       ;
@@ -68,29 +74,28 @@ void TIM2_IRQHandler(void)
     if (edge_detected == FALSE && (previous_adc_value > adc_threshold) && (adc_val < adc_threshold))
     {
       // clever way to ensure we have 120 pre-trigger samples
-      if (current_index % BUFFER_SIZE < 120)   
+      if (current_index % BUFFER_SIZE < 120)
       {
         edge_detected = FALSE;
-      }else
+      }
+      else
       {
         edge_detected = TRUE;
       }
 
       trigger_index = current_index;
-
     }
 
     adc_buffer[current_index] = adc_val;               // Store in buffer
     previous_adc_value = adc_val;                      // Update for next comparison
     current_index = (current_index + 1) % BUFFER_SIZE; // Increment and wrap index
 
-
     // Check if we have captured enough post-trigger samples
     if (edge_detected && ((current_index - trigger_index + BUFFER_SIZE) % BUFFER_SIZE) >= POST_TRIGGER_COUNT)
     {
       // everything will be reset here
       edge_detected = FALSE;
-      graph_ready = 1;                     // inform main to draw the graph
+      graph_ready = 1; // inform main to draw the graph
       first_reading_taken = FALSE;
       current_index = 0;
       waiting_for_rise = 1;
@@ -98,19 +103,15 @@ void TIM2_IRQHandler(void)
       {
         GPIOC->BSRR = GPIO_BSRR_BS_4;
       }
-      
-    
-      TIM2->CR1 &= ~TIM_CR1_CEN;           // now we have enough sampled data, stop the timer
+      if (GPIOC->ODR & GPIO_ODR_OD8)
+      {
+        GPIOC->BSRR = GPIO_BSRR_BR_8;
+      }
+
+      TIM2->CR1 &= ~TIM_CR1_CEN; // now we have enough sampled data, stop the timer
     }
-
-
   }
 }
-
-
-
-
-
 
 /**
  * @brief Interrupt handler for TIM21.
@@ -164,6 +165,18 @@ void TIM21_IRQHandler(void)
   }
 }
 
+/**
+ * @brief Initializes Timer 2 with the following configurations:
+ *        - Timer 2 clock enabled
+ *        - Timer 2 reset
+ *        - Prescaler set to 16
+ *        - Auto-reload value set to 400
+ *        - Auto-reload preload enabled
+ *        - Update interrupt enabled
+ *        - Interrupt priority set to 1
+ *        - Timer 2 started
+ * @return RC_SUCC indicating successful initialization
+ */
 uint32_t TIM2_init()
 {
   RCC->APB1ENR |= RCC_APB1ENR_TIM2EN; // Enable Timer 2 clock
@@ -184,7 +197,6 @@ uint32_t TIM2_init()
 
   TIM2->CR1 |= TIM_CR1_ARPE; // Enable auto-reload preload
 
-
   TIM2->DIER |= TIM_DIER_UIE; // Enable update interrupt
 
   NVIC_ClearPendingIRQ(TIM2_IRQn);
@@ -197,7 +209,15 @@ uint32_t TIM2_init()
   return RC_SUCC;
 }
 
-
+/**
+ * @brief Initializes Timer 21.
+ * 
+ * This function enables the Timer 21 clock, resets the Timer 21 peripheral,
+ * sets the prescaler and auto-reload values, enables the update interrupt,
+ * and configures the NVIC for Timer 21 interrupt handling.
+ * 
+ * @return RC_SUCC if initialization is successful.
+ */
 uint32_t TIM21_init()
 {
   RCC->APB2ENR |= RCC_APB2ENR_TIM21EN; // Enable Timer 2 clock
@@ -220,11 +240,17 @@ uint32_t TIM21_init()
   NVIC_SetPriority(TIM21_IRQn, 2);
   NVIC_EnableIRQ(TIM21_IRQn);
 
-
-
   return RC_SUCC;
 }
 
+/**
+ * @brief Resets the zoom level of TIM2 and updates the auto-reload register (ARR).
+ *
+ * This function calculates the new ARR value based on the zoom level and updates the ARR register of TIM2.
+ * The zoom level is used to divide the default ARR value by a power of 2, and then subtract 1.
+ *
+ * @return RC_SUCC indicating successful reset of the zoom level.
+ */
 uint32_t reset_TIM2_zoom_level()
 {
   const uint32_t ARR_DEFAULT = 400;
