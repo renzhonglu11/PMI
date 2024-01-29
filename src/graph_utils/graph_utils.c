@@ -53,7 +53,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t curve_color, ui
     }
 
     // charging
-    if (i > 0 && buffer[i] > buffer[i - 1])
+    if (i > 0 && buffer[i] >= buffer[i - 1])
     {
       initial_val = i;
       y_max = buffer[i];
@@ -101,7 +101,7 @@ uint32_t display_error(uint16_t buffer[], uint16_t line_color)
 {
   uint8_t only_falling_edge = 1;
   // no charging edge, return error
-  for (uint8_t i = 1; i < 5; i++)
+  for (uint8_t i = 1; i < 10; i++)
   {
     if (buffer[i - 1] < buffer[i])
     {
@@ -120,10 +120,10 @@ uint32_t display_error(uint16_t buffer[], uint16_t line_color)
   return RC_SUCC;
 }
 
-void displayValues(uint8_t zoomLevel)
+void displayValues(uint8_t zoomLevel, uint16_t txt_color)
 {
   int yPos = 8; // Example Y position, adjust based on your graph position
-  uint16_t txt_color = TXT_COLOR;
+
 
   // display template
   display_template();

@@ -11,23 +11,19 @@
 #include <stdio.h>
 #include "timer.h"
 #include "global_common.h"
-
-
-
-
+#include "button.h"
 
 
 uint16_t adc_buffer[BUFFER_SIZE];
 uint16_t extracted_data[BUFFER_SIZE];
 
 
+extern volatile uint8_t graph_ready;
+extern volatile uint8_t data_ready;
 
-extern uint8_t graph_ready;
-extern uint8_t data_ready;
 
 
-uint32_t initialize_gpio();
-uint32_t extract_samples(uint16_t *extracted_data);
-
+uint32_t initialize_project();
+uint32_t reset_project();
 
 #endif /* PMI_H */
