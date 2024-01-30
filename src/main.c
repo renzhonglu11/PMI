@@ -2,6 +2,9 @@
 #include <clocks.h>
 #include <pmi.h>
 
+
+
+
 int main(void)
 {
 
@@ -15,9 +18,15 @@ int main(void)
 
     if (graph_ready)
     {
+      /**
+       * 1. extract data from adc_buffer
+       * 2. draw the corresponding curve
+       * 3. display the values of metrics
+       * 4. reset the everything for the next display of sampled data
+      */
 
-      extract_samples(extracted_data);
-      draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
+      extract_samples(extracted_data);  
+      draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED); 
       displayValues(zoom_lvl, ILI9341_COLOR_WHITE);
       systick_delay_ms(500);
       reset_project();
