@@ -11,7 +11,7 @@ int main(void)
 
   while (1)
   {
-    systick_delay_ms(300);
+    systick_delay_ms(350);
 
     if (graph_ready)
     {
@@ -19,7 +19,7 @@ int main(void)
       extract_samples(extracted_data);
       draw_graph(extracted_data, BUFFER_SIZE, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED);
       displayValues(zoom_lvl, ILI9341_COLOR_WHITE);
-      systick_delay_ms(700);
+      systick_delay_ms(500);
       reset_project();
     }
   }

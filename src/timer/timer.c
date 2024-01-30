@@ -73,7 +73,7 @@ void TIM2_IRQHandler(void)
 
     if (edge_detected == FALSE && (previous_adc_value > adc_threshold) && (adc_val < adc_threshold))
     {
-      // clever way to ensure we have 120 pre-trigger samples
+      // ensure we have 120 pre-trigger samples
       if (current_index % BUFFER_SIZE < 120)
       {
         edge_detected = FALSE;
@@ -95,7 +95,7 @@ void TIM2_IRQHandler(void)
     {
       // everything will be reset here
       edge_detected = FALSE;
-      graph_ready = 1; // inform main to draw the graph
+      graph_ready = 1;                          // inform main to draw the graph
       first_reading_taken = FALSE;
       current_index = 0;
       waiting_for_rise = 1;
@@ -108,13 +108,13 @@ void TIM2_IRQHandler(void)
         GPIOC->BSRR = GPIO_BSRR_BR_8;
       }
 
-      TIM2->CR1 &= ~TIM_CR1_CEN; // now we have enough sampled data, stop the timer
+      TIM2->CR1 &= ~TIM_CR1_CEN;              // now we have enough sampled data, stop the timer
     }
   }
 }
 
 /**
- * @brief Interrupt handler for TIM21.
+ * @brief Interrupt handler for TIM21 for button debouncing.
  *
  * This function is called when the update interrupt flag of TIM21 is set.
  * It clears the interrupt flag, stops the timer, and processes button actions
@@ -190,9 +190,8 @@ uint32_t TIM2_init()
    * 16mhz/16 = 1mhz, easy prescaler
    * t = 1/1mhz*400 = 400 us, so ARR should be 400
    */
-  // TIM2->PSC = 16 - 1;
+  
   TIM2->PSC = 16; // Set prescaler to 16
-  // TIM2->ARR = 6400-1;
   TIM2->ARR = 400 - 1; // Set auto-reload to 400
 
   TIM2->CR1 |= TIM_CR1_ARPE; // Enable auto-reload preload
@@ -253,7 +252,7 @@ uint32_t TIM21_init()
  */
 uint32_t reset_TIM2_zoom_level()
 {
-  const uint32_t ARR_DEFAULT = 400;
+  const uint32_t ARR_DEFAULT = 400;     // use default value for timer2
 
   TIM2->ARR = ARR_DEFAULT / power_of_2(zoom_lvl) - 1;
 

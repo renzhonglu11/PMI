@@ -6,7 +6,7 @@ volatile uint8_t data_ready = 0;
 uint8_t rc_range = 0;
 uint32_t p2p_val = 0;
 volatile uint8_t graph_ready = 0;
-const float DIVISOR_MV = 4.095;
+const float DIVISOR_MV = 4.095;    // divisor for converting ADC value to mV, 4095/1000
 volatile uint8_t zoom_lvl = 1;
 uint16_t final_time_period = 0;
 
