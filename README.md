@@ -1,21 +1,22 @@
 # Project2 of PMI
 
+## Brief introduction of the project 2
 
-## ADC configuration
+**(Exercise 2 (Aufgabe 2) provides detialed and complete comments. If you would like to understand the logic of codes, please refer to the codes of exercise 2.)**
 
-- RCC_APBR2ENR -> ADCEN
-- RCC_IOPENR: open clock of GPIO pin
-- prescale?
-- GPIO analog input?
-- 
+### Timers
 
+Three Timers for this project:
 
-### ADC registers
+- **timer6:** create signal in the first exercise
+- **timer2:** create signal and get the ADC value
+- **timer21:** solve button debouncing issue
 
-ADC1->CR:
-ADEN: check if ADC is enable
-ADSTART: check if ADC starts
+### Interupts
 
+Two buttons interrupts for adjusting zoom levels.
 
-ADC1->ISR: status register
-EOCAL: bit is set by hardware when calibration completes
+### Data structure
+
+The ADC values are stored by the ring buffer. (120 post-trigger sample data and 120 pre-trigger sample data)
+
