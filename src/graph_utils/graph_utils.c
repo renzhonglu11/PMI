@@ -54,7 +54,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t curve_color, ui
     }
 
     // charging
-    if (i > 0 && (buffer[i] >= buffer[i - 1]) && y_max <= buffer[i])
+    if ((i > 0 && (buffer[i] >= buffer[i - 1]) && !rc_flag))
     {
       initial_val = i;
       y_max = buffer[i];
@@ -76,7 +76,10 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t curve_color, ui
 
     // ili9341_pixel_set(x, y, ILI9341_COLOR_BLUE);
     ili9341_draw_thick_line_horizontal(x, y, curve_color, 2);
+
+
     find_flag = 0;
+   
   }
 
   p2p_val = (y_max - y_min) * 5;
@@ -97,21 +100,23 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t curve_col
     ili9341_pixel_set(x, y + i, curve_color);
   }
 }
-
+#include <stdlib.h>
 uint32_t display_error(uint16_t buffer[], uint16_t line_color)
 {
-  uint8_t only_falling_edge = 1;
+  uint8_t only_falling_edge = 0;
   // no charging edge, return error
   for (uint8_t i = 1; i < 10; i++)
   {
-    if (buffer[i - 1] < buffer[i])
+    if (buffer[i - 1] > buffer[i])
     {
-      only_falling_edge = 0;
+      uint16_t diff_tmp = buffer[i-1] - buffer[i];
+      if(diff_tmp > 5)
+      {
+        only_falling_edge = 1;
+      }
+      
     }
   }
-
-
-  
 
   if (only_falling_edge || (buffer[119] - buffer[120] > 4000))
   {
