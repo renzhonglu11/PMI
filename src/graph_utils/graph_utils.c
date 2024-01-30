@@ -56,13 +56,21 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     return RC_PARAM_INVALID;
   }
 
+  uint16_t marks[50] = {0};
+  uint8_t marks_counter= 0;
   for (uint8_t i = 1; i < buffer_size; i++)
   {
 
     if (buffer[i] >= (2048) && buffer[i - 1] <= (2048)) // ensure its falling phase, i start with 1
     {
       uint16_t x_tmp = i * x_scale;
-      ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
+      
+      if(marks_counter < elements_of(marks))
+      {
+        marks[marks_counter++] = x_tmp;
+      }
+      
+      // ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
 
       if (last_rising_edge != -1)
       {
@@ -81,6 +89,16 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     ili9341_text_pos_set(5, 3);
     ili9341_str_print("ERROR!!!", line_color, BG_COLOR);
     return RC_PARAM_INVALID;
+  }
+
+  for(uint8_t i = 0;i < elements_of(marks);i++)
+  {
+    
+    if(marks[i] == 0)
+    {
+      break;
+    }
+    ili9341_line_draw(marks[i], 140, marks[i], 140 - 64, line_color);
   }
 
   // Plot the ADC values
