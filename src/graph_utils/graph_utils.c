@@ -24,23 +24,22 @@ void ili9341_draw_thick_line_horizontal(int16_t x, int16_t y, uint16_t color, ui
 uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t line_color)
 {
   struct display_info_s display_info = ili9341_display_info_get();
+  // toggle led
   if (GPIOC->ODR & GPIO_ODR_OD6)
   {
-    GPIOC->BSRR = GPIO_BSRR_BR_6; // Reset PC4 (set it to 0) if it is currently set
+    GPIOC->BSRR = GPIO_BSRR_BR_6; 
   }
   else
   {
-    GPIOC->BSRR = GPIO_BSRR_BS_6; // Set PC4 (set it to 1) if it is currently reset
+    GPIOC->BSRR = GPIO_BSRR_BS_6; 
   }
 
   // Determine scaling factors based on the display size and ADC range
   uint16_t x_scale = display_info.width / buffer_size;
-  float y_scale = 64.0 / 4096.0; // Now y_scale is a floating-point number
-
+  float y_scale = 64.0 / 4096.0; 
   int16_t last_rising_edge = -1;
   uint16_t total_time_period = 0;
   uint32_t time_period_counter = 0;
-
   uint16_t y_max = 0;
   uint8_t rc_flag = 0;
   int8_t find_flag = 0;
@@ -48,6 +47,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
   uint16_t y_min = 4095;
   error_flag = 0;
 
+  // if there are no jumpers 
   if (buffer[0] <= 3 && buffer[2] <= 3 && buffer[4] <= 3)
   {
     error_flag = 1;
@@ -56,21 +56,26 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     return RC_PARAM_INVALID;
   }
 
-  uint16_t marks[50] = {0};
+  uint16_t marks[50] = {0};    // marks for drawing lines
   uint8_t marks_counter= 0;
+
+  // calculate the total time periods
+  uint8_t waiting_for_rise = 1;  // trigger hysteresis
   for (uint8_t i = 1; i < buffer_size; i++)
   {
-
-    if (buffer[i] >= (2048) && buffer[i - 1] <= (2048)) // ensure its falling phase, i start with 1
+    // ensure its falling phase, i start with 1
+    if(waiting_for_rise)
+    {
+      if (buffer[i] >= (2048) && buffer[i - 1] <= (2048)) 
     {
       uint16_t x_tmp = i * x_scale;
       
+      // get marks for drawing lines
       if(marks_counter < elements_of(marks))
       {
         marks[marks_counter++] = x_tmp;
       }
-      
-      // ili9341_line_draw(x_tmp, 140, x_tmp, 140 - 64, line_color);
+    
 
       if (last_rising_edge != -1)
       {
@@ -80,7 +85,16 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
 
       last_rising_edge = i;
       time_period_counter++;
+      waiting_for_rise = 0;
     }
+    }else
+    {
+      if(buffer[i] <= 2048)
+      {
+        waiting_for_rise = 1;
+      }
+    }
+   
   }
 
   if (total_time_period == 0)
@@ -91,6 +105,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     return RC_PARAM_INVALID;
   }
 
+  // drawing lines
   for(uint8_t i = 0;i < elements_of(marks);i++)
   {
     
@@ -101,12 +116,14 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
     ili9341_line_draw(marks[i], 140, marks[i], 140 - 64, line_color);
   }
 
-  // Plot the ADC values
+  // Plot the ADC values graph
   for (uint8_t i = 0; i < buffer_size; i++)
   {
 
     int16_t x = i * x_scale;
     int16_t y = 140 - (int16_t)(buffer[i] * y_scale); // set 140 as the offset first
+    
+    // finding y_min and y_max
     if (y_min >= buffer[i])
     {
       y_min = buffer[i];
@@ -117,7 +134,7 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       y_max = buffer[i];
     }
 
-    // charging
+    // charging phase
     if (i > 0 && buffer[i] > buffer[i - 1])
     {
 
@@ -126,9 +143,10 @@ uint32_t draw_graph(uint16_t buffer[], int buffer_size, uint16_t color, uint16_t
       find_flag = 1;
     }
 
-    // discharging
+    // discharging phase
     if (i > 0 && !find_flag && !rc_flag)
     {
+      // constant value of t = RC: 1/(e^(-1)) = 0.368
       uint16_t target_val = (y_max * 368) / 1000; // easy numeric approximation
 
       if (buffer[i] <= target_val)
