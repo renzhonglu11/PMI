@@ -9,13 +9,6 @@ Codes are not updated frequently in this branch!!!
 ## Projects
 please refer to each branch for each project
 
-
-## Reference
-* [GPIO复用](https://www.guyuehome.com/38427)
-* [SPI协议](https://blog.csdn.net/qq_38410730/article/details/80318821)
-*
-
-
 ## Videos
 
 - Porject 1
