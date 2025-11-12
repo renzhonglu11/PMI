@@ -19,8 +19,11 @@ please refer to each branch for each project
 ## Videos
 
 - Porject 1
-<video src="Videos\video1.mov" controls width="640">Your browser does not support the video tag.</video>
+
+    [Download Project 1 video](Videos/video1.mov)
 - Project 2
-<video src="Videos\video2.mov" controls width="640">Your browser does not support the video tag.</video>
+
+    [Download Project 2 video](Videos/video1.mov)
 - Project 3
-- <video src="Videos\video3.mov" controls width="640">Your browser does not support the video tag.</video>
+
+    [Download Project 3 video](Videos/video1.mov)
