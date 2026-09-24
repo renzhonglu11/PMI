@@ -1,49 +1,23 @@
-# Project2 of PMI
+# Project 2 — three-sensor readout
 
-## SPI
+Firmware for the **NUCLEO-L053R8** that reads an **ADXL345** accelerometer over SPI1, a **QMC5883L** magnetometer over software I2C, and a **DS18B20** temperature sensor over one-wire. Readings appear on an **ILI9341** display and on the Nucleo USB serial connection at **115200 baud**. The main loop updates the serial output roughly every 300 ms after each sensor read.
 
-## ADXL345
+## Connections used by the code
 
-(if something does not work, refer back to the datasheet)
+| Device | Interface / pins |
+| --- | --- |
+| ADXL345 | SPI1 on PA5/PA6/PA7; PA12 is chip select. |
+| QMC5883L | Software I2C on PB8 (SCL) and PB9 (SDA), address `0x0D`. |
+| DS18B20 | One-wire on PB13. |
 
-### Data Registers
+The I2C implementation configures PB8/PB9 as open-drain outputs with pull-ups. Check the sensor and display wiring against the source and module requirements before powering the board.
 
-According to the ADXL345 datasheet, the data for each axis is stored in the following registers:
+## Build and run
 
-- **X-Axis Data:** `DATAX0` (least significant byte) and `DATAX1` (most significant byte)
-- **Y-Axis Data:** `DATAY0` and `DATAY1`
-- **Z-Axis Data:** `DATAZ0` and `DATAZ1`
+```sh
+pio run
+pio run --target upload
+pio device monitor
+```
 
-### Read Operation
-
-To read from these registers, you need to set the MSB (most significant bit) of the address to `1`, indicating a read operation.
-
-### Multi-byte Read
-
-You can use multi-byte read capability to read the 6 bytes of the X, Y, and Z data in a single SPI transaction. This is efficient and ensures that the data is read from the same sample.
-
-## I2C
-
-The software based I2C is configured as open-drain and pull-up.
-
-Open-drain allows device on the bus to pull the line low to trainsmit a '0' and then release the line (let it float) for the pull-up resistor to pull it high, represeting a '1'.
-
-### Why open-drain?
-
-1. Multi-Master capability
-2. Bidirectional data transfer on a single line
-3. Simplicity and reliability
-4. There's no risk of one device trying to drive the line high while another tries to drive it low. Such a situation, if it were to occur, would create a direct path from the positive voltage supply to ground, resulting in a short circuit.
-
-### Notes of I2C:
-
-**Simultaneous Actions**: If one device pulls the line low (to send a '0') while another device releases the line (either to send a '1' or to stop communicating), the action of pulling the line low will dominate. This is because the low state is an active state, where the line is physically connected to ground, whereas the high state is passive, relying only on the pull-up resistor.
-
-## TODO
-
-- [x] SPI
-- [x] software-based I2C
-- [x] one-wire protocol
-- [x] get correct and formated data from adxl345
-- [x] get correct and formated data from qmc5883
-- [x] get correct and formated data from ds18b20
+`src/main.c` calls `init_proj_2()` and repeatedly calls `send_sensor_data_over_UART()`. The line format is `ACC: X=... Y=... Z=... | MAG: X=... Y=... Z=... | TEMP: ...C`; the same values are drawn on the LCD. Initialization retries if the DS18B20 is not detected. See [`src/my_utils/my_utils.c`](src/my_utils/my_utils.c) for formatting and [Solutions.md](Solutions.md) for additional project notes.
