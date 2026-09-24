@@ -1,22 +1,14 @@
-# Project2 of PMI
+# Project 3 — signal capture and LCD graph
 
-## Brief introduction of the project 2
+This NUCLEO-L053R8 firmware samples an analog signal on **PC5 / ADC1 channel 15** and plots captured values on an **ILI9341** display. **TIM6** toggles the generated signal on PC4/PC8; **TIM2** drives ADC sampling; **TIM21** debounces the **PB1/PB2** zoom buttons. PB1 lowers and PB2 raises the zoom level within the range 1–5.
 
-**(Exercise 2 (Aufgabe 2) provides detialed and complete comments. If you would like to understand the logic of codes, please refer to the codes of exercise 2.)**
+The capture logic in [`src/timer/timer.c`](src/timer/timer.c) stores **240** samples in a circular buffer, detects a falling crossing of the ADC threshold, and collects **120 pre-trigger** and **120 post-trigger** samples. Once a capture is ready, [`src/main.c`](src/main.c) draws the waveform and measured values, then resets capture. Graph and metric calculations live in `src/graph_utils/`.
 
-### Timers
+## Build and upload
 
-Three Timers for this project:
+```sh
+pio run
+pio run --target upload
+```
 
-- **timer6:** create signal in the first exercise
-- **timer2:** create signal and get the ADC value
-- **timer21:** solve button debouncing issue
-
-### Interupts
-
-Two buttons interrupts for adjusting zoom levels.
-
-### Data structure
-
-The ADC values are stored by the ring buffer. (120 post-trigger sample data and 120 pre-trigger sample data)
-
+This branch is the timer-generated signal version. The [`proj_3_aufgabe2`](https://github.com/renzhonglu11/PMI/tree/proj_3_aufgabe2) branch instead adjusts the RC signal from ADC readings. The PlatformIO environment is `nucleo_l053r8` (CMSIS); connect the analog circuit, buttons and display according to the source before running on hardware.
