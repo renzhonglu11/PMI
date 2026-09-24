@@ -1,48 +1,18 @@
-# Ampelsteuerung
+# Project 1 — traffic-light controller (receiver)
 
-## MCP
+This branch runs the traffic-light state machine on a **NUCLEO-L053R8**. It writes LED patterns to an **MCP23017** GPIO expander at I2C address `0x20`, initializes an **ILI9341** display, and reads two buttons on **PB1/PB2**. The state definitions and transition table are in [`include/mcp23017.h`](include/mcp23017.h) and [`src/mcp23017/mcp23017.c`](src/mcp23017/mcp23017.c).
 
-Base address: `0x20`
+## UART receiver and timeout
 
-## GPIO
+`src/main.c` initializes USART2 at **115200 baud** with receive interrupts and starts TIM2. Receiving a byte clears `uart_timeout_flag` and echoes the byte. When the timer has counted three update events without a received byte, the main loop displays the lost-connection LED pattern; otherwise it runs the state machine. The code currently does **not** map received traffic-light characters to state transitions. The elapsed timeout in seconds depends on the timer clock and the `PSC`/`ARR` settings in [`src/uart_irq/uart_irq.c`](src/uart_irq/uart_irq.c).
 
-- GPIOA
-- GPIOB
+The companion sender is on [`proj_1_uart_master`](https://github.com/renzhonglu11/PMI/tree/proj_1_uart_master). For a host-side serial demonstration, `test-main-control.py` and `test-slave-control.py` require `pyserial`; set each script's hard-coded serial port before running it.
 
-## I2C
+## Build and upload
 
-Address Register: `Device address` + `Register address`
-
-## Datastructure of the finite state machine (Traffic lights)
-
-Almost all the data structure can be found in `mcp23017.h`.
-FSM table can be found in `mcp23017.c`.
-
-## TODO
-
-- [x] interrupt
-- [x] GPIO
-- [x] button
-- [x] LED
-- [x] loop LED
-- [x] traffic light
-- [x] led display for traffic light
-- [ ] connect two I2C boards (if time allows)
-
-## Details of exercise 3
-
-We use UART interrupt to receive the data from another board. The Timeout mechanism is implemented by using timer interrupt. For each 3 seconds of lost connection of UART, the timeout will be triggered.
-
-### Note
-
-Until now only not all functions are implemented.  Only the slave board has the timeout mechanism. After the connection of slave board, the leds will enter the initial state of exercise2. If there is timeout of receiving data, the leds will then enter to the lost connection state.
-
-Master boards can now only send characters to slave board. No timeout mechanism codes are implemented until yet.
-
-### TIMER2 configuration
-
+```sh
+pio run
+pio run --target upload
 ```
-TIM2->PSC = 639999;
-TIM2->ARR = 500;
-```
-Freuency of timer: `64MHZ`
+
+The PlatformIO environment is `nucleo_l053r8` using CMSIS. Connect the MCP23017, display and buttons according to the GPIO/I2C setup in the source before running on hardware.
