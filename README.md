@@ -1,3 +1,7 @@
+
+
+
+
 # PMI — Nucleo-L053R8 exercises and projects
 
 This repository contains separate PlatformIO/CMSIS implementations for the PMI exercises and three embedded projects. **Choose a branch before building:** each branch has its own `src/main.c` and hardware setup. The `main` branch is an index and retains an older exercise snapshot; it is not the combined application.
@@ -30,8 +34,12 @@ Every branch defines `env:nucleo_l053r8` with the `ststm32` platform and CMSIS f
 
 ## Demonstration videos
 
-- [Project 1](Videos/video1.mov)
-- [Project 2](Videos/video2.mov)
-- [Project 3](Videos/video3.mov)
+### Project 1
+https://github.com/user-attachments/assets/0730b3e6-070b-4cec-83c8-760b549fa057
+### Project 2
+https://github.com/user-attachments/assets/dc5a2271-0f57-431f-8509-49320302d5f4
+### Project 3
+https://github.com/user-attachments/assets/0bcc3af0-fc46-461a-bc91-ed84b4d1b4d7
+
 
 The original starter instructions are kept in [README-template.md](README-template.md).
